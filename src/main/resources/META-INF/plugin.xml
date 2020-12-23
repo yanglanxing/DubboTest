@@ -1,0 +1,40 @@
+<idea-plugin>
+    <id>com.yanglx</id>
+    <name>DubboTest</name>
+    <vendor email="dev_ylx@163.com" url="https://gitee.com/ylxabc/dubbo-test">yanglx</vendor>
+
+    <description>
+        <![CDATA[
+            DubboTest可以直接请求您的dubbo接口，在开发调试时希望能给您带来一些便利。
+            开始使用：
+            1.首先您需要先启动dubbo服务，暴漏您的接口。
+            2.找到您需要调试的接口方法，右键选择RunDubboTest，这时你可以看到DubboTest的窗口弹出，
+            而且随机生成了一些参数，你可以更改你的入参。参数确定好后点击run按钮就可以了。
+            address输入框可以选择以下两种类型
+            使用zookeeper地址：zookeeper://127.0.0.1:2181
+            使用dubbo直连：dubbo://127.0.0.1:2288
+            dubbo直连在初始化类时会快一些，不过您使用过的地址DubboTest会缓存起来以便下次使用时直接使用。
+            在输入框后有save按钮，您可以选择保存当前使用地址用以下次可以选择，您也可以点击delete按钮来删除当前地址
+            注意：
+            methodType这个字段需要对应你的接口入参类型，一般是不需要更改，因为鼠标右键选择后会为你自动生成。
+            当你的入参不是常规对象时，需要添加class字段来告诉dubbo你使用的是哪个类。
+        ]]>
+    </description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="DubboTest" secondary="false" anchor="right"
+                    factoryClass="com.yanglx.dubbo.test.DubboPanelToolWindow"/>
+        <applicationService serviceImplementation="com.yanglx.dubbo.test.DubboSetingState"/>
+    </extensions>
+
+    <actions>
+        <action id="DubboTestAction"
+                class="com.yanglx.dubbo.test.DubboTestToolWindowOpenAnAction" text="RunDubboTest"
+                description="DubboInvokerFrameOpen" popup="true">
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </action>
+    </actions>
+</idea-plugin>
