@@ -5,7 +5,7 @@ import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import com.alibaba.fastjson.JSON;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,10 +104,10 @@ public class DubboApiLocator {
         RegistryConfig registryConfig = registryConfigCache.get(key);
         if (null == registryConfig) {
             registryConfig = new RegistryConfig();
-            if (StringUtils.isNotEmpty(address)) {
+            if (StringUtils.isNotBlank(address)) {
                 registryConfig.setAddress(address);
             }
-            if (StringUtils.isNotEmpty(version)) {
+            if (StringUtils.isNotBlank(version)) {
                 registryConfig.setVersion(version);
             }
             registryConfigCache.put(key, registryConfig);

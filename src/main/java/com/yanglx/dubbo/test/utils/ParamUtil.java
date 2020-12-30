@@ -16,9 +16,6 @@ import java.util.List;
 import java.util.Map;
 
 public class ParamUtil {
-    static final String PARAM_TAG = "param";
-    static final String PREFIX = "example=";
-
     /**
      * 初始化参数
      */

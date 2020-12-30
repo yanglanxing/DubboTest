@@ -5,6 +5,7 @@ plugins {
 
 group 'com.yanglx'
 version '1.0'
+sourceCompatibility = 1.8
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
@@ -36,4 +37,5 @@ intellij {
     plugins = ['com.intellij.java']
 }
 patchPluginXml {
+//    token: 'perm:ZGV2X3lseA==.OTItMzA1Ng==.0cgD9ZuZcTWkmm2Sj04DgHdMhsyIDY'
 }

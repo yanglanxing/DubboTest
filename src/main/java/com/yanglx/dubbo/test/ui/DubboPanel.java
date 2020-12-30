@@ -10,8 +10,6 @@ import com.yanglx.dubbo.test.DubboSetingState;
 import com.yanglx.dubbo.test.dubbo.DubboApiLocator;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import com.yanglx.dubbo.test.utils.PluginUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.time.StopWatch;
 
 import javax.swing.*;
 import java.awt.*;
@@ -79,14 +77,14 @@ public class DubboPanel extends JPanel {
                 try {
                     tip.setText("正在请求...");
                     tip.updateUI();
-                    StopWatch stopWatch = StopWatch.createStarted();
+                    long start = System.currentTimeMillis();
                     DubboApiLocator dubboApiLocator = new DubboApiLocator();
                     Object invoke = dubboApiLocator.invoke(dubboMethodEntity);
                     PluginUtils.writeDocument(myProject,
                             jsonEditorResp.getDocument(),
                             JSON.toJSONString(invoke, SerializerFeature.PrettyFormat));
-                    stopWatch.stop();
-                    tip.setText("耗时:" + stopWatch.getTime());
+                    long end = System.currentTimeMillis();
+                    tip.setText("耗时:" + (end - start));
                     tip.updateUI();
                     return invoke;
                 } catch (Exception e1) {
@@ -120,7 +118,8 @@ public class DubboPanel extends JPanel {
         dubboMethodEntity.setInterfaceName(interfaceName.getText());
         dubboMethodEntity.setAddress((String) address.getSelectedItem());
         dubboMethodEntity.setVersion(versionTextField.getText());
-        if (StringUtils.isNotBlank(jsonEditorReq.getDocumentText())) {
+        if (jsonEditorReq.getDocumentText() != null
+                && jsonEditorReq.getDocumentText().length() > 0) {
             JSONObject jsonObject = JSON.parseObject(jsonEditorReq.getDocumentText());
             JSONArray methodTypeArray = jsonObject.getJSONArray("methodType");
             if (methodTypeArray != null) {

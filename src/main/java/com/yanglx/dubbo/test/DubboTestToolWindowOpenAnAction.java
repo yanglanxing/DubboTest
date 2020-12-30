@@ -13,9 +13,12 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiJavaFile;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiParameterList;
+import com.intellij.ui.content.Content;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import com.yanglx.dubbo.test.ui.DubboPanel;
 import com.yanglx.dubbo.test.utils.ParamUtil;
+
+import java.util.Objects;
 
 import static com.intellij.openapi.actionSystem.CommonDataKeys.EDITOR;
 
@@ -55,18 +58,23 @@ public class DubboTestToolWindowOpenAnAction extends AnAction {
         String methodName = psiMethod.getName();
 
         ToolWindow toolWindow = ToolWindowManager
-                .getInstance(e.getProject())
+                .getInstance(Objects.requireNonNull(e.getProject()))
                 .getToolWindow("DubboTest");
         if (toolWindow != null) {
             // 无论当前状态为关闭/打开，进行强制打开ToolWindow
-            toolWindow.show();
-            DubboPanel dubboPanel1 = (DubboPanel) toolWindow.getComponent().getComponent(0);
-            DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
-            dubboMethodEntity.setInterfaceName(interfaceName);
-            dubboMethodEntity.setParamObj(initParamArray);
-            dubboMethodEntity.setMethodType(methodType);
-            dubboMethodEntity.setMethodName(methodName);
-            DubboPanel.refreshUI(dubboPanel1, dubboMethodEntity);
+            toolWindow.show(() -> {
+
+            });
+            Content[] contents = toolWindow.getContentManager().getContents();
+            if (contents[0].getComponent() instanceof DubboPanel) {
+                DubboPanel dubboPanel1 = (DubboPanel) contents[0].getComponent() ;
+                DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
+                dubboMethodEntity.setInterfaceName(interfaceName);
+                dubboMethodEntity.setParamObj(initParamArray);
+                dubboMethodEntity.setMethodType(methodType);
+                dubboMethodEntity.setMethodName(methodName);
+                DubboPanel.refreshUI(dubboPanel1, dubboMethodEntity);
+            }
         }
     }
 }
