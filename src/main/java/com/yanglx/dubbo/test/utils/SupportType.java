@@ -1,7 +1,3 @@
-/**
- * Copyright ©2014-2019 Youzan.com All rights reserved
- * me.wbean.plugin.dubbo.invoker
- */
 package com.yanglx.dubbo.test.utils;
 
 import com.alibaba.fastjson.JSON;
@@ -29,8 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author wbean
- * @date 2019/2/15 上午11:59
+ * @author wbean,yanglx
  */
 public enum SupportType {
     BOOLEAN {
