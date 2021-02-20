@@ -12,44 +12,75 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.ui.components.panels.NonOpaquePanel;
 
-import java.awt.*;
-
+/**
+ * <p>Description: </p>
+ *
+ * @author yanglx
+ * @version 1.0.0
+ * @email "mailto:dev_ylx@163.com"
+ * @date 2021.02.20 15:57
+ * @since 1.0.0
+ */
 public class JsonEditor extends NonOpaquePanel {
+    private static final long serialVersionUID = -871105152589937225L;
     private final PsiFile psiFile;
-    private final FileEditor fileEditor;
     private final Project project;
 
     public JsonEditor(Project project) {
         this.project = project;
-        this.psiFile = createPsiFile();
+        this.psiFile = this.createPsiFile();
         VirtualFile virtualFile = this.psiFile.getVirtualFile();
-        this.fileEditor = createFileEditor(virtualFile);
-        add((Component) this.fileEditor.getComponent(), "Center");
+        FileEditor fileEditor = this.createFileEditor(virtualFile);
+        this.add(fileEditor.getComponent(), "Center");
     }
 
+    /**
+     * Create file editor
+     *
+     * @param virtualFile virtual file
+     * @return the file editor
+     * @since 1.0.0
+     */
     private FileEditor createFileEditor(VirtualFile virtualFile) {
         return PsiAwareTextEditorProvider.getInstance().createEditor(this.project, virtualFile);
     }
 
-    public String getDocumentText(){
-        Document document = getDocument();
+    /**
+     * Get document text
+     *
+     * @return the string
+     * @since 1.0.0
+     */
+    public String getDocumentText() {
+        Document document = this.getDocument();
         return document.getText();
     }
 
-    public Document getDocument(){
+    /**
+     * Get document
+     *
+     * @return the document
+     * @since 1.0.0
+     */
+    public Document getDocument() {
         PsiDocumentManager instance = PsiDocumentManager.getInstance(this.project);
-        Document document = instance.getDocument(this.psiFile);
-        return document;
+        return instance.getDocument(this.psiFile);
     }
 
+    /**
+     * Create psi file
+     *
+     * @return the psi file
+     * @since 1.0.0
+     */
     private PsiFile createPsiFile() {
         JsonFileType fileType = JsonFileType.INSTANCE;
         PsiFile psiFile = PsiFileFactory.getInstance(this.project)
-                .createFileFromText("tmp." + fileType.getDefaultExtension()
-                        , fileType.getLanguage()
-                        , (CharSequence) ""
-                        , true
-                        , false);
+            .createFileFromText("tmp." + fileType.getDefaultExtension()
+                , fileType.getLanguage()
+                , "{}"
+                , true
+                , false);
         psiFile.putUserData(Key.create("JSON_HELPER"), "TEST");
         return psiFile;
     }

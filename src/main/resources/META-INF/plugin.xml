@@ -4,65 +4,32 @@
     <version>1.0</version>
     <vendor email="dev_ylx@163.com" url="">yanglx</vendor>
 
-    <description><![CDATA[
-<img src="https://raw.githubusercontent.com/yanglanxing/img/master/DubboTest.gif">
-
-<h3>DubboTest can directly request your dubbo interface, and hope to bring you some convenience
-    when developing and
-    debugging.</h3>
-
-<h3>Quick start:</h3>
-
-<p>1.First, you need to start the dubbo service first to expose your interface</p>
-<p>2.Find the interface method you need to debug, right-click and select RunDubboTest, then you can see the DubboTest
-    window pops up, and some parameters are randomly generated, you can change your input parameters. After the
-    parameters are determined, click the run button.</p>
-
-<h3>The address input box can choose the following two types.</h3>
-<p>use zookeeper: zookeeper://127.0.0.1:2181</p>
-<p>use dubbo: dubbo://127.0.0.1:2288</p>
-
-<h3><em>tips:</em></h3>
-<p><em>1.The methodType field needs to correspond to the input parameter type of your interface,
-        and generally does not need to be changed, because it will be automatically generated
-        for you after you right-click and select it. When your input parameter is not a regular object,
-        you need to add a class field to tell dubbo which class you are using.</em></p>
-<p><em>2.There is a save button behind the input box了‘, you can choose to save the current address for
-        selection next time, or you can click the delete button to delete the current address</em></p>
-<br/>
-<hr>
-
-<h3>DubboTest可以直接请求您的dubbo接口，在开发调试时希望能给你带来一些便利。</h3>
-<h3>开始使用：</h3>
-<p>1.首先您需要先启动dubbo服务，暴漏您的接口。</p>
-<p>2.找到您需要调试的接口方法，右键选择RunDubboTest，这时你可以看到DubboTest的窗口弹出，
-    而且随机生成了一些参数，你可以更改你的入参。参数确定好后点击run按钮就可以了。</p>
-
-<h3>address输入框可以选择以下两种类型</h3>
-<p>使用zookeeper地址：zookeeper://127.0.0.1:2181</p>
-<p>使用dubbo直连：dubbo://127.0.0.1:2288</p>
-
-<h3><em>小提示:</em></h3>
-<p><em>1.methodType这个字段需要对应你的接口入参类型，一般是不需要更改，因为鼠标右键选择后会为你自动生成。
-        当你的入参不是常规对象时，需要添加class字段来告诉dubbo你使用的是哪个类。</em></p>
-<p><em>2.在输入框后有save按钮，您可以选择保存当前使用地址用以下次可以选择，您也可以点击delete按钮来删除当前地址</em></p>
-
-        ]]>
-    </description>
+    <description><![CDATA[DubboTest. Will be replaced by gradle build]]></description>
+    <change-notes><![CDATA[REPLACED BY pluginDescription.html]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow id="DubboTest" secondary="false" anchor="right"
+        <toolWindow id="DubboTest"
+                    secondary="false"
+                    anchor="bottom"
+                    icon="/icons/dubbo.svg"
                     factoryClass="com.yanglx.dubbo.test.DubboPanelToolWindow"/>
         <applicationService serviceImplementation="com.yanglx.dubbo.test.DubboSetingState"/>
+        <!-- alt + enter -->
+        <intentionAction>
+            <className>com.yanglx.dubbo.test.action.DubboTestIntentionAction</className>
+        </intentionAction>
     </extensions>
 
     <actions>
         <action id="DubboTestAction"
-                class="com.yanglx.dubbo.test.DubboTestToolWindowOpenAnAction" text="RunDubboTest"
-                description="DubboInvokerFrameOpen" popup="true">
+                class="com.yanglx.dubbo.test.action.DubboTestToolWindowOpenAnAction"
+                text="RunDubboTest"
+                description="DubboInvokerFrameOpen"
+                icon="/icons/dubbo.svg"
+                popup="true">
             <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </action>
     </actions>
