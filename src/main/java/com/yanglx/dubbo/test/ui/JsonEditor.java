@@ -22,10 +22,19 @@ import com.intellij.ui.components.panels.NonOpaquePanel;
  * @since 1.0.0
  */
 public class JsonEditor extends NonOpaquePanel {
+    /** serialVersionUID */
     private static final long serialVersionUID = -871105152589937225L;
+    /** Psi file */
     private final PsiFile psiFile;
+    /** Project */
     private final Project project;
 
+    /**
+     * Json editor
+     *
+     * @param project project
+     * @since 1.0.0
+     */
     public JsonEditor(Project project) {
         this.project = project;
         this.psiFile = this.createPsiFile();
