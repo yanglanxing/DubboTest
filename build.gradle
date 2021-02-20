@@ -36,6 +36,3 @@ intellij {
     version '2020.2.4'
     plugins = ['com.intellij.java']
 }
-patchPluginXml {
-//    token: 'perm:ZGV2X3lseA==.OTItMzA1Ng==.0cgD9ZuZcTWkmm2Sj04DgHdMhsyIDY'
-}
