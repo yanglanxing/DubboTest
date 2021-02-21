@@ -46,6 +46,7 @@ intellij {
     plugins = ['com.intellij.java']
     // 插件生成的临时文件的地址，可以省略
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+    updateSinceUntilBuild = true
 }
 
 runIde {
@@ -54,6 +55,8 @@ runIde {
 
 patchPluginXml {
     version "${project.version}"
+    sinceBuild(pluginSinceBuild)
+    untilBuild(pluginUntilBuild)
     pluginDescription(file('includes/pluginDescription.html').text)
     changeNotes(file('includes/pluginChanges.html').text)
 }
