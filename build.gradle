@@ -1,11 +1,14 @@
 plugins {
     id 'java'
+    id "io.freefair.lombok" version "5.3.0"
     id 'org.jetbrains.intellij' version '0.6.5'
 }
 
-group 'com.yanglx'
-version '1.0'
-sourceCompatibility = 1.8
+group group
+version version
+
+sourceCompatibility = javaVersion
+targetCompatibility = javaVersion
 
 repositories {
     maven { url 'https://maven.aliyun.com/repository/public/' }
@@ -14,25 +17,48 @@ repositories {
 }
 
 dependencies {
-    compile ('com.alibaba:dubbo:2.6.4'){
+    implementation('com.alibaba:dubbo:2.6.4') {
         exclude group: 'org.springframework'
     }
-    compile ('com.alibaba:fastjson:1.2.75')
-    compile ('org.apache.zookeeper:zookeeper:3.4.13')
-    compile ('org.apache.curator:curator-framework:4.0.1')
-    compile ('org.apache.curator:curator-client:4.0.1')
-    compile ('org.javassist:javassist:3.20.0-GA')
-    compile 'org.apache.commons:commons-lang3:3.11'
+    implementation('com.alibaba:fastjson:1.2.75')
+    implementation('org.apache.zookeeper:zookeeper:3.4.13')
+    implementation('org.apache.curator:curator-framework:4.0.1')
+    implementation('org.apache.curator:curator-client:4.0.1')
+    implementation('org.javassist:javassist:3.20.0-GA')
+    implementation 'org.apache.commons:commons-lang3:3.11'
+
+    testImplementation(
+            'junit:junit:4.13',
+            'org.mockito:mockito-core:3.3.3',
+            'org.assertj:assertj-core:3.15.0',
+            'org.assertj:assertj-swing-junit:3.9.2',
+    )
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
+lombok {
+    version = "1.18.18"
+    generateLombokConfig.enabled = false
+}
+
 intellij {
-    //低版本
-//    version '2018.3.3'
-//    version '2019.3.1'
-//    version '2020.2'
-//    plugins = ['com.intellij.java']
-    //高版本
-    version '2020.2.4'
+    pluginName name
+    version ideaVersion
     plugins = ['com.intellij.java']
+    // 插件生成的临时文件的地址，可以省略
+    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
+}
+
+runIde {
+    jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
+}
+
+patchPluginXml {
+    version "${project.version}"
+    pluginDescription(file('includes/pluginDescription.html').text)
+    changeNotes(file('includes/pluginChanges.html').text)
+}
+
+publishPlugin {
+    token = System.getenv("publishToken")
+    channels publishChannels
 }

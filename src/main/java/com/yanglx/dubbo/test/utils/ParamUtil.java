@@ -15,11 +15,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * <p>Description: </p>
+ *
+ * @author yanglx
+ * @version 1.0.0
+ * @email "mailto:dev_ylx@163.com"
+ * @date 2021.02.20 15:57
+ * @since 1.0.0
+ */
 public class ParamUtil {
     /**
      * 初始化参数
+     *
+     * @param psiParameterList psi parameter list
+     * @param psiDocComment    psi doc comment
+     * @return the object [ ]
+     * @since 1.0.0
      */
-    public static Object[] getInitParamArray(PsiParameterList psiParameterList,PsiDocComment psiDocComment) {
+    public static Object[] getInitParamArray(PsiParameterList psiParameterList, PsiDocComment psiDocComment) {
         Map<String, String> docParams = new HashMap<>();
         List<Object> paramList = new ArrayList<>();
         for (PsiParameter psiParameter : psiParameterList.getParameters()) {
@@ -30,14 +44,22 @@ public class ParamUtil {
         return paramList.toArray();
     }
 
-    public static Object getValue(SupportType type,PsiParameter psiVariable){
+    /**
+     * Get value
+     *
+     * @param type        type
+     * @param psiVariable psi variable
+     * @return the object
+     * @since 1.0.0
+     */
+    public static Object getValue(SupportType type, PsiParameter psiVariable) {
         JavaPsiFacade instance = JavaPsiFacade
-                .getInstance(psiVariable.getProject());
-        switch (type){
+            .getInstance(psiVariable.getProject());
+        switch (type) {
             case OTHER:
                 PsiClass psiClass = instance
-                        .findClass(psiVariable.getType().getCanonicalText(),
-                                new ProjectAndLibrariesScope(psiVariable.getProject()));
+                    .findClass(psiVariable.getType().getCanonicalText(),
+                               new ProjectAndLibrariesScope(psiVariable.getProject()));
                 return obj2Map(psiClass);
             case LIST:
                 String canonicalText = psiVariable.getType().getCanonicalText();
@@ -45,11 +67,11 @@ public class ParamUtil {
                     canonicalText = canonicalText.substring(canonicalText.indexOf("<") + 1, canonicalText.length() - 1);
                 }
                 PsiClass psiClass1 = instance
-                        .findClass(canonicalText,
-                                new ProjectAndLibrariesScope(psiVariable.getProject()));
+                    .findClass(canonicalText,
+                               new ProjectAndLibrariesScope(psiVariable.getProject()));
                 if (psiClass1 == null) {
                     return new ArrayList<>();
-                }else {
+                } else {
                     SupportType touch = SupportType.touch(psiClass1.getQualifiedName());
                     ArrayList arrayList = new ArrayList<>();
                     arrayList.add(obj2Map(psiClass1));
@@ -60,6 +82,13 @@ public class ParamUtil {
         }
     }
 
+    /**
+     * Obj 2 map
+     *
+     * @param psiClass psi class
+     * @return the json object
+     * @since 1.0.0
+     */
     private static JSONObject obj2Map(PsiClass psiClass) {
         PsiField[] allField = PsiClassImplUtil.getAllFields(psiClass);
         JSONObject result = new JSONObject(allField.length);
@@ -74,9 +103,9 @@ public class ParamUtil {
             SupportType supportType = SupportType.touch(psiField);
             if (supportType == SupportType.OTHER) {
                 PsiClass subPsiClass = JavaPsiFacade
-                        .getInstance(psiClass.getProject())
-                        .findClass(psiField.getType().getCanonicalText(),
-                                new ProjectAndLibrariesScope(psiClass.getProject()));
+                    .getInstance(psiClass.getProject())
+                    .findClass(psiField.getType().getCanonicalText(),
+                               new ProjectAndLibrariesScope(psiClass.getProject()));
                 result.put(psiField.getName(), obj2Map(subPsiClass));
             } else {
                 result.put(psiField.getName(), "");
