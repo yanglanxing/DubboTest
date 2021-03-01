@@ -1,11 +1,7 @@
 <idea-plugin>
     <id>com.yanglx</id>
     <name>DubboTest</name>
-    <version>1.0</version>
     <vendor email="dev_ylx@163.com" url="">yanglx</vendor>
-
-    <description><![CDATA[DubboTest. Will be replaced by gradle build]]></description>
-    <change-notes><![CDATA[REPLACED BY pluginDescription.html]]></change-notes>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
