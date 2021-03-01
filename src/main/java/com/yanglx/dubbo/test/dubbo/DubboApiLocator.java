@@ -6,7 +6,6 @@ import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.rpc.service.GenericService;
 import com.alibaba.fastjson.JSON;
 import com.yanglx.dubbo.test.PluginConstants;
-
 import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
@@ -133,14 +132,16 @@ public class DubboApiLocator {
             reference.setRetries(0);
             reference.setTimeout(10 * 1000);
             if (addressType.equals(AddressTypeEnum.zookeeper)) {
-                RegistryConfig registryConfig = getRegistryConfig(dubboMethodEntity.getAddress(),
-                                                                  dubboMethodEntity.getVersion());
+                RegistryConfig registryConfig = getRegistryConfig(dubboMethodEntity);
                 reference.setRegistry(registryConfig);
             } else if (addressType.equals(AddressTypeEnum.dubbo)) {
                 reference.setUrl(dubboMethodEntity.getAddress());
             }
             if (StringUtils.isNotBlank(dubboMethodEntity.getVersion())) {
                 reference.setVersion(dubboMethodEntity.getVersion());
+            }
+            if (StringUtils.isNotBlank(dubboMethodEntity.getGroup())) {
+                reference.setGroup(dubboMethodEntity.getGroup());
             }
             cacheReferenceMap.put(key, reference);
         }
@@ -150,13 +151,15 @@ public class DubboApiLocator {
     /**
      * Gets registry config *
      *
-     * @param address address
-     * @param version version
+     * @param dubboMethodEntity dubboMethodEntity
      * @return the registry config
      * @since 1.0.0
      */
-    private static RegistryConfig getRegistryConfig(String address, String version) {
-        String key = address + "-" + version;
+    private static RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
+        String address = dubboMethodEntity.getAddress();
+        String version = dubboMethodEntity.getVersion();
+        String group = dubboMethodEntity.getGroup();
+        String key = address + "-" + version + "-" + group;
         RegistryConfig registryConfig = registryConfigCache.get(key);
         if (null == registryConfig) {
             registryConfig = new RegistryConfig();
@@ -166,6 +169,10 @@ public class DubboApiLocator {
             if (StringUtils.isNotBlank(version)) {
                 registryConfig.setVersion(version);
             }
+            if (StringUtils.isNotBlank(group)) {
+                registryConfig.setGroup(group);
+            }
+            registryConfig.setRegister(false);
             registryConfigCache.put(key, registryConfig);
         }
         return registryConfig;

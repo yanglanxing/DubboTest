@@ -20,6 +20,8 @@ public class DubboMethodEntity {
     private String methodName;
     /** Version */
     private String version;
+    /** Group */
+    private String group;
     /** Method type */
     private String[] methodType;
     /** Param obj */

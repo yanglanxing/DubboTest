@@ -66,6 +66,8 @@ public class DubboPanel extends JPanel {
     private JTextField methodNameTextField;
     /** Version text field */
     private JTextField versionTextField;
+    /** group text field */
+    private JTextField groupTextField;
     /** Json editor req */
     private JsonEditor jsonEditorReq;
     /** Json editor resp */
@@ -156,12 +158,14 @@ public class DubboPanel extends JPanel {
         JTextField interfaceName = this.getInterfaceNameTextField();
         JTextField methodName = this.getMethodNameTextField();
         JTextField versionTextField = this.getVersionTextField();
+        JTextField groupTextField = this.getGroupTextField();
         JComboBox<String> address = this.getAddressBox();
         JsonEditor jsonEditorReq = this.getJsonEditorReq();
         this.dubboMethodEntity.setMethodName(methodName.getText());
         this.dubboMethodEntity.setInterfaceName(interfaceName.getText());
         this.dubboMethodEntity.setAddress((String) address.getSelectedItem());
         this.dubboMethodEntity.setVersion(versionTextField.getText());
+        this.dubboMethodEntity.setGroup(groupTextField.getText());
         if (jsonEditorReq.getDocumentText() != null
             && jsonEditorReq.getDocumentText().length() > 0) {
             JSONObject jsonObject = JSON.parseObject(jsonEditorReq.getDocumentText());
