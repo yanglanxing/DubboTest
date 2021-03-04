@@ -5,12 +5,14 @@ import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * <p>Description: </p>
@@ -28,7 +30,9 @@ import java.util.List;
 public class DubboSetingState implements PersistentStateComponent<DubboSetingState> {
 
     /** Address */
-    public List<String> address = new ArrayList<>();
+    public Map<String,CacheInfo> paramInfoCache = new TreeMap<>();
+
+    public Map<String,CacheInfo> HistoryParamInfoCache = new TreeMap<>();
 
     /**
      * Gets address *
@@ -36,21 +40,39 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
      * @return the address
      * @since 1.0.0
      */
-    public List<String> getAddress() {
-        if (this.address.isEmpty()) {
-            this.address.add("zookeeper://127.0.0.1:2181");
+    public List<CacheInfo> getParamInfoCache(CacheType cacheType) {
+        if (CacheType.COLLECTIONS.equals(cacheType)) {
+            return new ArrayList<>(paramInfoCache.values());
+        }else {
+            return new ArrayList<>(HistoryParamInfoCache.values());
         }
-        return this.address;
     }
 
     /**
-     * Sets address *
+     * 添加
      *
      * @param address address
      * @since 1.0.0
      */
-    public void setAddress(List<String> address) {
-        this.address = address;
+    public void add(String id, CacheInfo address, CacheType cacheType) {
+        if (CacheType.COLLECTIONS.equals(cacheType)) {
+            this.paramInfoCache.put(id,address);
+        }else {
+            this.HistoryParamInfoCache.put(id,address);
+        }
+    }
+
+    /**
+     * 移除
+     * @param id
+     */
+    public void remove(String id,CacheType cacheType){
+        if (CacheType.COLLECTIONS.equals(cacheType)) {
+            this.paramInfoCache.remove(id);
+        }else {
+            this.HistoryParamInfoCache.remove(id);
+        }
+
     }
 
     /**
@@ -86,4 +108,8 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
         XmlSerializerUtil.copyBean(state, this);
     }
 
+    public enum CacheType{
+        HISTORY,
+        COLLECTIONS
+    }
 }
