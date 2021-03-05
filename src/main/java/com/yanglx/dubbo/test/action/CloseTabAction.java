@@ -1,13 +1,16 @@
 package com.yanglx.dubbo.test.action;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.actionSystem.ActionManager;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
 import com.yanglx.dubbo.test.ui.TabBar;
 import org.jetbrains.annotations.NotNull;
 
-public class CloseTabAction extends AbstractTabEditorAction {
+/**
+ * 关闭tab
+ */
+public class CloseTabAction extends AnAction {
 
     private TabBar tabBar;
     private String tabId;
@@ -20,8 +23,6 @@ public class CloseTabAction extends AbstractTabEditorAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        ActionManager actionManager = e.getActionManager();
-        System.out.println("actionManager = " + actionManager);
         e.getProject();
         tabBar.closeTab(tabId);
     }

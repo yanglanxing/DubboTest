@@ -8,6 +8,7 @@ import lombok.Data;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 public class CacheInfo implements Serializable {
@@ -74,5 +75,18 @@ public class CacheInfo implements Serializable {
     @Override
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof CacheInfo)) return false;
+        CacheInfo cacheInfo = (CacheInfo) o;
+        return id.equals(cacheInfo.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

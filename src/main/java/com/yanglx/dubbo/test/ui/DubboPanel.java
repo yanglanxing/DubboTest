@@ -8,12 +8,20 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.components.JBPanel;
 import com.yanglx.dubbo.test.CacheInfo;
 import com.yanglx.dubbo.test.DubboSetingState;
-import com.yanglx.dubbo.test.DubboTestBundle;
 import com.yanglx.dubbo.test.dubbo.DubboApiLocator;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import com.yanglx.dubbo.test.utils.PluginUtils;
+import com.yanglx.dubbo.test.utils.StringUtils;
+import lombok.Getter;
+import lombok.Setter;
 
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +30,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-
-import javax.swing.*;
-
-import com.yanglx.dubbo.test.utils.StringUtils;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * <p>Description: </p>
@@ -56,7 +58,7 @@ public class DubboPanel extends JBPanel {
     /** Tip */
     private JLabel tip;
     /** Save btn */
-    private JButton saveBtn;
+    private JButton saveAsBtn;
     /** Address box */
     private JTextField addressField;
     /** Method name text field */
@@ -65,6 +67,7 @@ public class DubboPanel extends JBPanel {
     private JTextField versionTextField;
     /** group text field */
     private JTextField groupTextField;
+    private JButton saveBtn;
     /** Json editor req */
     private JsonEditor jsonEditorReq;
     /** Json editor resp */
@@ -85,15 +88,16 @@ public class DubboPanel extends JBPanel {
 
         this.project = project;
         this.setLayout(new BorderLayout());
-        this.add(this.mainPanel, BorderLayout.CENTER, 0);
+        this.add(this.mainPanel, BorderLayout.CENTER);
 
         this.jsonEditorReq = new JsonEditor(project);
-        this.reqPane.add(this.jsonEditorReq, BorderLayout.CENTER, 0);
+        this.reqPane.add(this.jsonEditorReq, BorderLayout.CENTER);
 
         this.jsonEditorResp = new JsonEditor(project);
-        this.respPane.add(this.jsonEditorResp, BorderLayout.CENTER, 0);
+        this.respPane.add(this.jsonEditorResp, BorderLayout.CENTER);
 
-        this.saveBtn.addActionListener(e -> {
+        //给定一个收藏名称进行收藏
+        this.saveAsBtn.addActionListener(e -> {
             DubboSetingState instance = DubboSetingState.getInstance();
             this.refreshDubboMethodEntity();
             if (isBlankEntity()) {
@@ -108,12 +112,27 @@ public class DubboPanel extends JBPanel {
                 }
                 String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
                 CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
-                instance.add(id,of, DubboSetingState.CacheType.COLLECTIONS);
+                instance.add(of, DubboSetingState.CacheType.COLLECTIONS);
                 //刷新左边树结构
                 leftTree.refresh();
             }
         });
+        //默认使用接口名和方法名作为收藏名进行收藏
+        saveBtn.addActionListener(e -> {
+            DubboSetingState instance = DubboSetingState.getInstance();
+            this.refreshDubboMethodEntity();
+            if (isBlankEntity()) {
+                return;
+            }
+            String name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
+            String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
+            CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
+            instance.add(of, DubboSetingState.CacheType.COLLECTIONS);
+            //刷新左边树结构
+            leftTree.refresh();
+        });
 
+        //执行dubbo请求
         this.button1.addActionListener(e -> {
             this.refreshDubboMethodEntity();
             if (isBlankEntity()) {
@@ -124,7 +143,7 @@ public class DubboPanel extends JBPanel {
             String id = UUID.randomUUID().toString();
             String name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
             CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
-            instance.add(id,of, DubboSetingState.CacheType.HISTORY);
+            instance.add(of, DubboSetingState.CacheType.HISTORY);
             //刷新左边树结构
             leftTree.refresh();
 
@@ -132,7 +151,8 @@ public class DubboPanel extends JBPanel {
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             Future<Object> submit = executorService.submit(() -> {
                 try {
-                    this.tip.setText(DubboTestBundle.message("dubbo-test.invokeing.tootip"));
+//                    this.tip.setText(DubboTestBundle.message("dubbo-test.invokeing.tootip"));
+                    this.tip.setText("Requesting...");
                     this.tip.updateUI();
                     long start = System.currentTimeMillis();
                     DubboApiLocator dubboApiLocator = new DubboApiLocator();
@@ -141,11 +161,11 @@ public class DubboPanel extends JBPanel {
                                               this.jsonEditorResp.getDocument(),
                                               JSON.toJSONString(invoke, SerializerFeature.PrettyFormat));
                     long end = System.currentTimeMillis();
-                    this.tip.setText("耗时:" + (end - start));
+                    this.tip.setText("time:" + (end - start));
                     this.tip.updateUI();
                     return invoke;
                 } catch (Exception e1) {
-                    this.tip.setText("错误:" + e1.getMessage());
+                    this.tip.setText("error:" + e1.getMessage());
                     this.tip.updateUI();
                 }
                 return new Object();
@@ -154,7 +174,8 @@ public class DubboPanel extends JBPanel {
                 try {
                     submit.get(4000, TimeUnit.MILLISECONDS);
                 } catch (Exception ignored) {
-                    DubboPanel.this.tip.setText(DubboTestBundle.message("dubbo-test.invoke.timeout.tootip"));
+//                    DubboPanel.this.tip.setText(DubboTestBundle.message("dubbo-test.invoke.timeout.tootip"));
+                    DubboPanel.this.tip.setText("Timeout...");
                     DubboPanel.this.tip.updateUI();
                 }
             });

@@ -7,11 +7,13 @@ import com.yanglx.dubbo.test.CacheInfo;
 import com.yanglx.dubbo.test.DubboSetingState;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 
-import javax.swing.*;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
-import java.awt.*;
+import java.awt.BorderLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
@@ -24,7 +26,7 @@ public class TreePanel extends JPanel {
 
     private TreeNodeTypeEnum nowTreeNodeTypeEnum;
 
-    public void refresh(){
+    public void refresh() {
         this.createTree(nowTreeNodeTypeEnum);
     }
 
@@ -34,11 +36,11 @@ public class TreePanel extends JPanel {
         List<CacheInfo> paramInfoCache;
         DefaultMutableTreeNode root;
         if (TreeNodeTypeEnum.COLLECTIONS.equals(treeNodeTypeEnum)) {
-            root = new DefaultMutableTreeNode("收藏");
+            root = new DefaultMutableTreeNode("Collections");
             DubboSetingState instance = DubboSetingState.getInstance();
             paramInfoCache = instance.getParamInfoCache(DubboSetingState.CacheType.COLLECTIONS);
         } else {
-            root = new DefaultMutableTreeNode("历史");
+            root = new DefaultMutableTreeNode("History");
             DubboSetingState instance = DubboSetingState.getInstance();
             paramInfoCache = instance.getParamInfoCache(DubboSetingState.CacheType.HISTORY);
         }
@@ -58,27 +60,30 @@ public class TreePanel extends JPanel {
                 CacheInfo cacheInfo = (CacheInfo) userObject;
                 DubboMethodEntity dubboMethodEntity = cacheInfo.getDubboMethodEntity();
                 TabInfo selectedInfo = TabBar.getSelectionTabInfo();
-                Tab component = (Tab)selectedInfo.getComponent();
+                Tab component = (Tab) selectedInfo.getComponent();
                 DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
             }
         });
 
         //右键删除操作
-        JPopupMenu menu=new JPopupMenu();
-        JMenuItem menuItem=new JMenuItem("删除");
+        JPopupMenu menu = new JPopupMenu();
+        JMenuItem menuItem = new JMenuItem("delete");
         menu.add(menuItem);
         menuItem.addActionListener(e -> {
             DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+            if (lastSelectedPathComponent == null) {
+                return;
+            }
             Object userObject = lastSelectedPathComponent.getUserObject();
             if (userObject instanceof CacheInfo) {
                 CacheInfo cacheInfo = (CacheInfo) userObject;
                 if (TreeNodeTypeEnum.COLLECTIONS.equals(nowTreeNodeTypeEnum)) {
-                    DubboSetingState.getInstance().remove(cacheInfo.getId(), DubboSetingState.CacheType.COLLECTIONS);
-                }else {
-                    DubboSetingState.getInstance().remove(cacheInfo.getId(), DubboSetingState.CacheType.HISTORY);
+                    DubboSetingState.getInstance().remove(cacheInfo, DubboSetingState.CacheType.COLLECTIONS);
+                } else {
+                    DubboSetingState.getInstance().remove(cacheInfo, DubboSetingState.CacheType.HISTORY);
                 }
                 //删除节点
-                DefaultTreeModel model =(DefaultTreeModel) tree.getModel();
+                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
                 model.removeNodeFromParent(lastSelectedPathComponent);
                 tree.updateUI();
             }

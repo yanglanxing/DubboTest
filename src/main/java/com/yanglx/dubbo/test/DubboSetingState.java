@@ -15,8 +15,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Queue;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -35,11 +37,12 @@ import java.util.stream.Collectors;
 )
 public class DubboSetingState implements PersistentStateComponent<DubboSetingState> {
 
-    /** Address */
-    public Map<String,CacheInfo> paramInfoCache = new TreeMap<>();
-
-    public Map<String,CacheInfo> HistoryParamInfoCache = new TreeMap<>();
-
+    /** 存放收藏 */
+    public LinkedList<CacheInfo> paramInfoCacheList = new LinkedList<>();
+    /** 存放历史 */
+    public LinkedList<CacheInfo> historyParamInfoCacheList = new LinkedList<>();
+    //限制最大历史记录条数
+    private static final int MAX_HISTORY_SIZE = 200;
     /**
      * Gets address *
      *
@@ -48,41 +51,42 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
      */
     public List<CacheInfo> getParamInfoCache(CacheType cacheType) {
         if (CacheType.COLLECTIONS.equals(cacheType)) {
-            List<CacheInfo> list = new ArrayList<>(paramInfoCache.values());
-
-            Collections.sort(list, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
-            return list;
+            Collections.sort(paramInfoCacheList, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
+            return paramInfoCacheList;
         }else {
-            List<CacheInfo> list = new ArrayList<>(HistoryParamInfoCache.values());
-
-            Collections.sort(list, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
-            return list;
+            Collections.sort(historyParamInfoCacheList, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
+            return historyParamInfoCacheList;
         }
     }
 
     /**
      * 添加
      *
-     * @param address address
+     * @param cacheInfo
      * @since 1.0.0
      */
-    public void add(String id, CacheInfo address, CacheType cacheType) {
+    public void add(CacheInfo cacheInfo, CacheType cacheType) {
         if (CacheType.COLLECTIONS.equals(cacheType)) {
-            this.paramInfoCache.put(id, address);
+            this.paramInfoCacheList.remove(cacheInfo);
+            this.paramInfoCacheList.add(cacheInfo);
         }else {
-            this.HistoryParamInfoCache.put(id,address);
+            if (paramInfoCacheList.size() >= MAX_HISTORY_SIZE) {
+                this.historyParamInfoCacheList.addFirst(cacheInfo);
+                this.historyParamInfoCacheList.removeLast();
+            }else {
+                this.historyParamInfoCacheList.add(cacheInfo);
+            }
         }
     }
 
     /**
-     * 移除
-     * @param id
+     * 移除缓存
      */
-    public void remove(String id,CacheType cacheType){
+    public void remove(CacheInfo cacheInfo,CacheType cacheType){
         if (CacheType.COLLECTIONS.equals(cacheType)) {
-            this.paramInfoCache.remove(id);
+            this.paramInfoCacheList.remove(cacheInfo);
         }else {
-            this.HistoryParamInfoCache.remove(id);
+            this.historyParamInfoCacheList.remove(cacheInfo);
         }
 
     }

@@ -9,7 +9,6 @@ import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.ui.tabs.impl.JBEditorTabs;
 import com.yanglx.dubbo.test.action.CloseTabAction;
-import com.yanglx.dubbo.test.action.RenameTabAction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +24,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     private TreePanel leftTree;
 
     public TabBar(@Nullable Project project, TreePanel leftTree) {
-        super(project, IdeFocusManager.findInstance(), (Disposable)project);
+        super(project, IdeFocusManager.findInstance(), project);
         this.project = project;
         this.leftTree = leftTree;
         tabsMap = new LinkedHashMap<>();
@@ -34,20 +33,11 @@ public class TabBar extends JBEditorTabs implements TabsListener {
         this.addTab();
     }
 
-    private void setupTabMenu() {
-        DefaultActionGroup tabActionGroup = new DefaultActionGroup();
-
-        RenameTabAction renameTabAction = new RenameTabAction(this);
-
-        tabActionGroup.add(renameTabAction);
-        this.setPopupGroup(tabActionGroup, "EditorTabPopup", true);
-    }
-
     public void addTab() {
         String tabId = UUID.randomUUID().toString();
 
         DefaultActionGroup closeActionGroup = new DefaultActionGroup();
-        closeActionGroup.add(new CloseTabAction(this,tabId));
+        closeActionGroup.add(new CloseTabAction(this, tabId));
 
         Tab tab = new Tab(this.project, tabId, this.leftTree);
         TabInfo tabInfo = new TabInfo(tab);
@@ -75,8 +65,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
         activeTabId = tab.getId();
     }
 
-    public static TabInfo getSelectionTabInfo(){
-        TabInfo tabInfo = tabsMap.get(activeTabId);
-        return tabInfo;
+    public static TabInfo getSelectionTabInfo() {
+        return tabsMap.get(activeTabId);
     }
 }

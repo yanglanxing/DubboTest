@@ -1,11 +1,15 @@
 package com.yanglx.dubbo.test.action;
 
 import com.intellij.icons.AllIcons;
+import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.yanglx.dubbo.test.ui.TabBar;
 import org.jetbrains.annotations.NotNull;
 
-public class AddTabAction extends AbstractTabEditorAction {
+/**
+ * 添加tab
+ */
+public class AddTabAction extends AnAction {
 
     private TabBar tabBar;
 

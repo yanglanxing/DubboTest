@@ -11,9 +11,13 @@ import com.intellij.ui.JBSplitter;
 import com.yanglx.dubbo.test.action.AddTabAction;
 import com.yanglx.dubbo.test.action.CollectionsAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.HistoryAbstractTabEditorAction;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
+@Getter
+@Setter
 public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
     private ActionManager actionManager;
@@ -22,32 +26,8 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
     private TreePanel leftTree;
 
-    public ActionManager getActionManager() {
-        return actionManager;
-    }
-
-    public void setActionManager(ActionManager actionManager) {
-        this.actionManager = actionManager;
-    }
-
-    public TabBar getTabBar() {
-        return tabBar;
-    }
-
-    public void setTabBar(TabBar tabBar) {
-        this.tabBar = tabBar;
-    }
-
-    public TreePanel getLeftTree() {
-        return leftTree;
-    }
-
-    public void setLeftTree(TreePanel leftTree) {
-        this.leftTree = leftTree;
-    }
-
     public ToolBarPanel(Project project, ToolWindow toolWindow) {
-        super(false,true);
+        super(false, true);
 
         actionManager = ActionManager.getInstance();
 
@@ -55,14 +35,12 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
         JBSplitter mContentSplitter = new JBSplitter();
         mContentSplitter.setProportion(0.1f);
 
-
-
         //左树结构,默认为收藏
         leftTree = new TreePanel();
         leftTree.createTree(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
         mContentSplitter.setFirstComponent(leftTree);
         //tabBar
-        tabBar = new TabBar(project,leftTree);
+        tabBar = new TabBar(project, leftTree);
         mContentSplitter.setSecondComponent(tabBar);
 
         this.setToolbar(createToolbar());
@@ -70,7 +48,7 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
     }
 
 
-    private JComponent createToolbar(){
+    private JComponent createToolbar() {
         AddTabAction addTabAction = new AddTabAction(tabBar);
 
         HistoryAbstractTabEditorAction abstractTabEditorAction = new HistoryAbstractTabEditorAction(leftTree);
