@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.components.JBPanel;
 import com.yanglx.dubbo.test.CacheInfo;
 import com.yanglx.dubbo.test.DubboSetingState;
 import com.yanglx.dubbo.test.DubboTestBundle;
@@ -39,7 +40,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class DubboPanel extends JPanel {
+public class DubboPanel extends JBPanel {
 
     private static final long serialVersionUID = -8541227582365214834L;
     /** Main panel */
@@ -80,19 +81,17 @@ public class DubboPanel extends JPanel {
      * @param project    project
      * @since 1.0.0
      */
-    public DubboPanel(Project project,MyDefaultMutableTreeNode leftTree) {
+    public DubboPanel(Project project, TreePanel leftTree) {
 
         this.project = project;
         this.setLayout(new BorderLayout());
-        this.add(this.mainPanel, "Center", 0);
+        this.add(this.mainPanel, BorderLayout.CENTER, 0);
 
         this.jsonEditorReq = new JsonEditor(project);
-        this.reqPane.add(this.jsonEditorReq, "Center", 0);
+        this.reqPane.add(this.jsonEditorReq, BorderLayout.CENTER, 0);
 
         this.jsonEditorResp = new JsonEditor(project);
-        this.respPane.add(this.jsonEditorResp, "Center", 0);
-
-
+        this.respPane.add(this.jsonEditorResp, BorderLayout.CENTER, 0);
 
         this.saveBtn.addActionListener(e -> {
             DubboSetingState instance = DubboSetingState.getInstance();
@@ -100,12 +99,19 @@ public class DubboPanel extends JPanel {
             if (isBlankEntity()) {
                 return;
             }
-            String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
-            String name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
-            CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
-            instance.add(id,of, DubboSetingState.CacheType.COLLECTIONS);
-            //刷新左边树结构
-            leftTree.refresh();
+            NameDialogue dialogue = new NameDialogue(project);
+            dialogue.show();
+            if (dialogue.isOK()){
+                String name = dialogue.getText();
+                if (StringUtils.isBlank(name)) {
+                    name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
+                }
+                String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
+                CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
+                instance.add(id,of, DubboSetingState.CacheType.COLLECTIONS);
+                //刷新左边树结构
+                leftTree.refresh();
+            }
         });
 
         this.button1.addActionListener(e -> {

@@ -1,11 +1,13 @@
 package com.yanglx.dubbo.test;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class CacheInfo implements Serializable {
@@ -44,6 +46,29 @@ public class CacheInfo implements Serializable {
         cacheInfo.setAddress(dubboMethodEntity.getAddress());
         cacheInfo.setDate(new Date());
         return cacheInfo;
+    }
+
+    /**
+     * 将CacheInfo转换DubboMethodEntity并返回
+     * @return
+     */
+    public DubboMethodEntity getDubboMethodEntity(){
+        DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
+        dubboMethodEntity.setId(this.getId());
+        dubboMethodEntity.setInterfaceName(this.getInterfaceName());
+        dubboMethodEntity.setMethodName(this.getMethodName());
+        dubboMethodEntity.setVersion(this.getVersion());
+        dubboMethodEntity.setGroup(this.getGroup());
+        List<String> stringList = JSON.parseArray(this.getMethodTypeJson(), String.class);
+        String[] methodTypes = new String[stringList.size()];
+        for (int i = 0; i < stringList.size(); i++) {
+            methodTypes[i] = stringList.get(i);
+        }
+        dubboMethodEntity.setMethodType(methodTypes);
+        JSONArray objects = JSON.parseArray(this.getParamObjJson());
+        dubboMethodEntity.setParamObj(objects.toArray());
+        dubboMethodEntity.setAddress(this.getAddress());
+        return dubboMethodEntity;
     }
 
     @Override

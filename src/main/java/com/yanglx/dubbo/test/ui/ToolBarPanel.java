@@ -20,7 +20,7 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
     private TabBar tabBar;
 
-    private MyDefaultMutableTreeNode leftTree;
+    private TreePanel leftTree;
 
     public ActionManager getActionManager() {
         return actionManager;
@@ -38,11 +38,11 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
         this.tabBar = tabBar;
     }
 
-    public MyDefaultMutableTreeNode getLeftTree() {
+    public TreePanel getLeftTree() {
         return leftTree;
     }
 
-    public void setLeftTree(MyDefaultMutableTreeNode leftTree) {
+    public void setLeftTree(TreePanel leftTree) {
         this.leftTree = leftTree;
     }
 
@@ -58,8 +58,8 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
 
         //左树结构,默认为收藏
-        leftTree = new MyDefaultMutableTreeNode();
-        leftTree.createTree(MyDefaultMutableTreeNode.TreeNodeTypeEnum.COLLECTIONS);
+        leftTree = new TreePanel();
+        leftTree.createTree(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
         mContentSplitter.setFirstComponent(leftTree);
         //tabBar
         tabBar = new TabBar(project,leftTree);

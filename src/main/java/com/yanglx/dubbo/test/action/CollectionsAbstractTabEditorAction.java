@@ -2,20 +2,19 @@ package com.yanglx.dubbo.test.action;
 
 import com.intellij.icons.AllIcons;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.ui.treeStructure.Tree;
-import com.yanglx.dubbo.test.ui.MyDefaultMutableTreeNode;
+import com.yanglx.dubbo.test.ui.TreePanel;
 import org.jetbrains.annotations.NotNull;
 
 public class CollectionsAbstractTabEditorAction extends AbstractTabEditorAction {
-    private MyDefaultMutableTreeNode component;
+    private TreePanel component;
 
-    public CollectionsAbstractTabEditorAction(MyDefaultMutableTreeNode component) {
+    public CollectionsAbstractTabEditorAction(TreePanel component) {
         super("收藏", "Parses and formats the JSON", AllIcons.Nodes.Folder);
         this.component = component;
     }
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        component.createTree(MyDefaultMutableTreeNode.TreeNodeTypeEnum.COLLECTIONS);
+        component.createTree(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
     }
 }

@@ -12,7 +12,7 @@ public class Tab extends JPanel {
 
     private DubboPanel dubboPanel;
 
-    public Tab(@NotNull Project project, @NotNull String id,@NotNull MyDefaultMutableTreeNode leftTree) {
+    public Tab(@NotNull Project project, @NotNull String id,@NotNull TreePanel leftTree) {
         dubboPanel = new DubboPanel(project,leftTree);
         this.setLayout(new BorderLayout());
         this.add(dubboPanel, BorderLayout.CENTER, 0);

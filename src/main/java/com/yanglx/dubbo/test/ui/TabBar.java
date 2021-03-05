@@ -22,9 +22,9 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     public static Map<String, TabInfo> tabsMap;
     public static String activeTabId;
     private Project project;
-    private MyDefaultMutableTreeNode leftTree;
+    private TreePanel leftTree;
 
-    public TabBar(@Nullable Project project,MyDefaultMutableTreeNode leftTree) {
+    public TabBar(@Nullable Project project, TreePanel leftTree) {
         super(project, IdeFocusManager.findInstance(), (Disposable)project);
         this.project = project;
         this.leftTree = leftTree;
