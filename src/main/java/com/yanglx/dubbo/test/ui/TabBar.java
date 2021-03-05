@@ -68,6 +68,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
         this.removeTab(tabInfo);
     }
 
+
     @Override
     public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
         Tab tab = (Tab) newSelection.getComponent();
@@ -75,6 +76,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     }
 
     public static TabInfo getSelectionTabInfo(){
-        return tabsMap.get(activeTabId);
+        TabInfo tabInfo = tabsMap.get(activeTabId);
+        return tabInfo;
     }
 }

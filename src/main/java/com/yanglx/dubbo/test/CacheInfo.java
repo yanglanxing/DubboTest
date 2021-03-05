@@ -1,13 +1,29 @@
 package com.yanglx.dubbo.test;
 
+import com.alibaba.fastjson.JSON;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
+@Data
 public class CacheInfo implements Serializable {
 
-    private DubboMethodEntity dubboMethodEntity;
+    /** Interface name */
+    private String interfaceName;
+    /** Method name */
+    private String methodName;
+    /** Version */
+    private String version;
+    /** Group */
+    private String group;
+    /** Method type */
+    private String methodTypeJson;
+    /** Param obj */
+    private String paramObjJson;
+    /** Address */
+    private String address;
 
     private String name;
 
@@ -19,41 +35,15 @@ public class CacheInfo implements Serializable {
         CacheInfo cacheInfo = new CacheInfo();
         cacheInfo.setId(id);
         cacheInfo.setName(name);
-        cacheInfo.setDubboMethodEntity(dubboMethodEntity);
+        cacheInfo.setInterfaceName(dubboMethodEntity.getInterfaceName());
+        cacheInfo.setMethodName(dubboMethodEntity.getMethodName());
+        cacheInfo.setVersion(dubboMethodEntity.getVersion());
+        cacheInfo.setGroup(dubboMethodEntity.getGroup());
+        cacheInfo.setMethodTypeJson(JSON.toJSONString(dubboMethodEntity.getMethodType()));
+        cacheInfo.setParamObjJson(JSON.toJSONString(dubboMethodEntity.getParamObj()));
+        cacheInfo.setAddress(dubboMethodEntity.getAddress());
         cacheInfo.setDate(new Date());
         return cacheInfo;
-    }
-
-    public DubboMethodEntity getDubboMethodEntity() {
-        return dubboMethodEntity;
-    }
-
-    public void setDubboMethodEntity(DubboMethodEntity dubboMethodEntity) {
-        this.dubboMethodEntity = dubboMethodEntity;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
     }
 
     @Override

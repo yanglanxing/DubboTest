@@ -1,18 +1,24 @@
 package com.yanglx.dubbo.test;
 
+import com.alibaba.fastjson.JSON;
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
+import com.sun.jna.platform.win32.Netapi32Util;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 /**
  * <p>Description: </p>
@@ -42,9 +48,15 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
      */
     public List<CacheInfo> getParamInfoCache(CacheType cacheType) {
         if (CacheType.COLLECTIONS.equals(cacheType)) {
-            return new ArrayList<>(paramInfoCache.values());
+            List<CacheInfo> list = new ArrayList<>(paramInfoCache.values());
+
+            Collections.sort(list, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
+            return list;
         }else {
-            return new ArrayList<>(HistoryParamInfoCache.values());
+            List<CacheInfo> list = new ArrayList<>(HistoryParamInfoCache.values());
+
+            Collections.sort(list, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
+            return list;
         }
     }
 
@@ -56,7 +68,7 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
      */
     public void add(String id, CacheInfo address, CacheType cacheType) {
         if (CacheType.COLLECTIONS.equals(cacheType)) {
-            this.paramInfoCache.put(id,address);
+            this.paramInfoCache.put(id, address);
         }else {
             this.HistoryParamInfoCache.put(id,address);
         }
