@@ -100,7 +100,7 @@ public class DubboPanel extends JPanel {
             if (isBlankEntity()) {
                 return;
             }
-            String id = UUID.randomUUID().toString();
+            String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
             String name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
             CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
             instance.add(id,of, DubboSetingState.CacheType.COLLECTIONS);
@@ -118,7 +118,9 @@ public class DubboPanel extends JPanel {
             String id = UUID.randomUUID().toString();
             String name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
             CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
-            instance.add(id,of, DubboSetingState.CacheType.COLLECTIONS);
+            instance.add(id,of, DubboSetingState.CacheType.HISTORY);
+            //刷新左边树结构
+            leftTree.refresh();
 
             PluginUtils.writeDocument(this.project, this.jsonEditorResp.getDocument(), "");
             ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -201,11 +203,19 @@ public class DubboPanel extends JPanel {
      * @since 1.0.0
      */
     public static void refreshUI(DubboPanel dubboPanel, DubboMethodEntity dubboMethodEntity) {
+        dubboPanel.dubboMethodEntity.setId(dubboMethodEntity.getId());
         JTextField textField1 = dubboPanel.getInterfaceNameTextField();
         JTextField textField2 = dubboPanel.getMethodNameTextField();
         JsonEditor jsonEditorReq = dubboPanel.getJsonEditorReq();
         textField1.setText(dubboMethodEntity.getInterfaceName());
         textField2.setText(dubboMethodEntity.getMethodName());
+
+        JTextField textField3 = dubboPanel.getAddressField();
+        textField3.setText(dubboMethodEntity.getAddress());
+        JTextField textField4 = dubboPanel.getGroupTextField();
+        textField4.setText(dubboMethodEntity.getGroup());
+        JTextField textField5 = dubboPanel.getVersionTextField();
+        textField5.setText(dubboMethodEntity.getVersion());
 
         Map<String, Object> map = new HashMap<>();
         map.put("param", dubboMethodEntity.getParamObj());

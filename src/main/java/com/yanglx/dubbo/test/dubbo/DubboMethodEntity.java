@@ -14,6 +14,7 @@ import lombok.Data;
 @Data
 public class DubboMethodEntity {
 
+    private String id;
     /** Interface name */
     private String interfaceName;
     /** Method name */
