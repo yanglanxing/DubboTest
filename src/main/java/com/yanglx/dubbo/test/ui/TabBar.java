@@ -1,7 +1,7 @@
 package com.yanglx.dubbo.test.ui;
 
 import com.intellij.icons.AllIcons;
-import com.intellij.openapi.Disposable;
+import com.intellij.openapi.actionSystem.ActionManager;
 import com.intellij.openapi.actionSystem.DefaultActionGroup;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.IdeFocusManager;
@@ -24,7 +24,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     private TreePanel leftTree;
 
     public TabBar(@Nullable Project project, TreePanel leftTree) {
-        super(project, IdeFocusManager.findInstance(), project);
+        super(project, ActionManager.getInstance(), IdeFocusManager.getInstance(project), project);
         this.project = project;
         this.leftTree = leftTree;
         tabsMap = new LinkedHashMap<>();

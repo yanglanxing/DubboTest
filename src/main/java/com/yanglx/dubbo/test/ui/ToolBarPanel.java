@@ -11,6 +11,7 @@ import com.intellij.ui.JBSplitter;
 import com.yanglx.dubbo.test.action.AddTabAction;
 import com.yanglx.dubbo.test.action.CollectionsAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.HistoryAbstractTabEditorAction;
+import com.yanglx.dubbo.test.action.SettingAction;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -53,11 +54,12 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
         HistoryAbstractTabEditorAction abstractTabEditorAction = new HistoryAbstractTabEditorAction(leftTree);
         CollectionsAbstractTabEditorAction collectionsAbstractTabEditorAction = new CollectionsAbstractTabEditorAction(leftTree);
-
+        SettingAction settingAction = new SettingAction();
         DefaultActionGroup actionGroup = new DefaultActionGroup();
         actionGroup.add(addTabAction);
         actionGroup.add(collectionsAbstractTabEditorAction);
         actionGroup.add(abstractTabEditorAction);
+        actionGroup.add(settingAction);
         ActionToolbar actionToolbar = actionManager.createActionToolbar("toolbar", actionGroup, false);
         return actionToolbar.getComponent();
     }

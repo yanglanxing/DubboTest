@@ -7,6 +7,7 @@ import com.intellij.openapi.components.State;
 import com.intellij.openapi.components.Storage;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import com.sun.jna.platform.win32.Netapi32Util;
+import com.yanglx.dubbo.test.utils.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +42,8 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
     public LinkedList<CacheInfo> paramInfoCacheList = new LinkedList<>();
     /** 存放历史 */
     public LinkedList<CacheInfo> historyParamInfoCacheList = new LinkedList<>();
+
+    public CacheInfo defaultSetting;
     //限制最大历史记录条数
     private static final int MAX_HISTORY_SIZE = 200;
     /**
@@ -57,6 +60,20 @@ public class DubboSetingState implements PersistentStateComponent<DubboSetingSta
             Collections.sort(historyParamInfoCacheList, (o1, o2) -> o2.getDate().compareTo(o1.getDate()));
             return historyParamInfoCacheList;
         }
+    }
+
+    public void setDefaultSetting(CacheInfo cacheInfo){
+        this.defaultSetting = cacheInfo;
+    }
+
+    public CacheInfo getDefaultSetting(){
+        if (this.defaultSetting == null ||
+                StringUtils.isBlank(this.defaultSetting.getAddress())) {
+            CacheInfo cacheInfo = new CacheInfo();
+            cacheInfo.setAddress("zookeeper://127.0.0.1:2181");
+            this.setDefaultSetting(cacheInfo);
+        }
+        return this.defaultSetting;
     }
 
     /**

@@ -17,6 +17,9 @@
         <intentionAction>
             <className>com.yanglx.dubbo.test.action.DubboTestIntentionAction</className>
         </intentionAction>
+        <applicationConfigurable parentId="tools" instance="com.yanglx.dubbo.test.config.AppSettingsConfigurable"
+                                 id="org.intellij.sdk.settings.AppSettingsConfigurable"
+                                 displayName="DubboTest"/>
     </extensions>
 
     <actions>
@@ -26,7 +29,7 @@
                 description="DubboInvokerFrameOpen"
                 icon="/icons/dubbo.svg"
                 popup="true">
-            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </action>
     </actions>
 </idea-plugin>
