@@ -23,12 +23,14 @@ public class DubboApiLocatorTest extends TestCase {
     public void test() {
         DubboApiLocator dubboApiLocator = new DubboApiLocator();
         DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
-        dubboMethodEntity.setParamObj(new Object[] {"YHQBgI8UmB"});
+        dubboMethodEntity.setParamObj(new Object[] {"你好啊"});
         dubboMethodEntity.setMethodType(new String[] {"java.lang.String"});
-        dubboMethodEntity.setInterfaceName("com.test.service.HelloService");
-        dubboMethodEntity.setMethodName("sayHelloStr");
-        dubboMethodEntity.setAddress("zookeeper://127.0.0.1:2181");
+        dubboMethodEntity.setInterfaceName("org.apache.dubbo.admin.api.GreetingService");
+        dubboMethodEntity.setMethodName("sayHello");
+        dubboMethodEntity.setVersion("1.0.0");
+//        dubboMethodEntity.setAddress("zookeeper://127.0.0.1:2181");
+        dubboMethodEntity.setAddress("dubbo://127.0.0.1:20880");
         Object invoke = dubboApiLocator.invoke(dubboMethodEntity);
-        System.out.print(JSON.toJSONString(invoke));
+        System.out.println("返回报文："+JSON.toJSONString(invoke));
     }
 }

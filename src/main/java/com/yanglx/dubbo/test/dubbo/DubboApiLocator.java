@@ -28,9 +28,6 @@ public class DubboApiLocator {
     /** cacheReferenceMap */
     private static final Map<String, ReferenceConfig<GenericService>> cacheReferenceMap = new ConcurrentHashMap<>();
 
-    /** registryConfigCache */
-    private static final Map<String, RegistryConfig> registryConfigCache = new ConcurrentHashMap<>();
-
     static {
         application.setName(PluginConstants.PLUGIN_NAME);
     }
@@ -157,24 +154,8 @@ public class DubboApiLocator {
      */
     private static RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
         String address = dubboMethodEntity.getAddress();
-        String version = dubboMethodEntity.getVersion();
-        String group = dubboMethodEntity.getGroup();
-        String key = address + "-" + version + "-" + group;
-        RegistryConfig registryConfig = registryConfigCache.get(key);
-        if (null == registryConfig) {
-            registryConfig = new RegistryConfig();
-            if (StringUtils.isNotBlank(address)) {
-                registryConfig.setAddress(address);
-            }
-            if (StringUtils.isNotBlank(version)) {
-                registryConfig.setVersion(version);
-            }
-            if (StringUtils.isNotBlank(group)) {
-                registryConfig.setGroup(group);
-            }
-            registryConfig.setRegister(false);
-            registryConfigCache.put(key, registryConfig);
-        }
+        RegistryConfig registryConfig = new RegistryConfig();;
+        registryConfig.setAddress(address);
         return registryConfig;
     }
 

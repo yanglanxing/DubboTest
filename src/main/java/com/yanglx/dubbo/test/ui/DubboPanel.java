@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.intellij.openapi.project.Project;
+import com.intellij.ui.JBSplitter;
 import com.intellij.ui.components.JBPanel;
 import com.yanglx.dubbo.test.CacheInfo;
 import com.yanglx.dubbo.test.DubboSetingState;
@@ -15,10 +16,13 @@ import com.yanglx.dubbo.test.utils.StringUtils;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.border.Border;
+import javax.swing.border.CompoundBorder;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,9 +56,9 @@ public class DubboPanel extends JBPanel {
     /** Interface name text field */
     private JTextField interfaceNameTextField;
     /** Req pane */
-    private JPanel reqPane;
+//    private JPanel reqPane;
     /** Resp pane */
-    private JPanel respPane;
+//    private JPanel respPane;
     /** Tip */
     private JLabel tip;
     /** Save btn */
@@ -68,6 +72,7 @@ public class DubboPanel extends JBPanel {
     /** group text field */
     private JTextField groupTextField;
     private JButton saveBtn;
+    private JPanel editorPane;
     /** Json editor req */
     private JsonEditor jsonEditorReq;
     /** Json editor resp */
@@ -90,11 +95,19 @@ public class DubboPanel extends JBPanel {
         this.setLayout(new BorderLayout());
         this.add(this.mainPanel, BorderLayout.CENTER);
 
+        //分割线
+        JBSplitter mContentSplitter = new JBSplitter();
+        mContentSplitter.setProportion(0.5f);
         this.jsonEditorReq = new JsonEditor(project);
-        this.reqPane.add(this.jsonEditorReq, BorderLayout.CENTER);
-
+        this.jsonEditorReq.setBorder(BorderFactory.createTitledBorder("Params"));
         this.jsonEditorResp = new JsonEditor(project);
-        this.respPane.add(this.jsonEditorResp, BorderLayout.CENTER);
+        this.jsonEditorResp.setBorder(BorderFactory.createTitledBorder("Response"));
+        mContentSplitter.setFirstComponent(jsonEditorReq);
+        mContentSplitter.setSecondComponent(jsonEditorResp);
+        this.editorPane.add(mContentSplitter,BorderLayout.CENTER);
+
+//        this.reqPane.add(this.jsonEditorReq, BorderLayout.CENTER);
+//        this.respPane.add(this.jsonEditorResp, BorderLayout.CENTER);
 
         //给定一个收藏名称进行收藏
         this.saveAsBtn.addActionListener(e -> {
