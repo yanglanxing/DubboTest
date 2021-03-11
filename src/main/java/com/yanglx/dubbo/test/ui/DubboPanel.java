@@ -163,29 +163,32 @@ public class DubboPanel extends JBPanel {
             PluginUtils.writeDocument(this.project, this.jsonEditorResp.getDocument(), "");
             ExecutorService executorService = Executors.newSingleThreadExecutor();
             Future<Object> submit = executorService.submit(() -> {
+
+                //                    this.tip.setText(DubboTestBundle.message("dubbo-test.invokeing.tootip"));
+                this.tip.setText("Requesting...");
+                this.tip.updateUI();
+                long start = System.currentTimeMillis();
+                DubboApiLocator dubboApiLocator = new DubboApiLocator();
+                Object invoke = null;
                 try {
-//                    this.tip.setText(DubboTestBundle.message("dubbo-test.invokeing.tootip"));
-                    this.tip.setText("Requesting...");
-                    this.tip.updateUI();
-                    long start = System.currentTimeMillis();
-                    DubboApiLocator dubboApiLocator = new DubboApiLocator();
-                    Object invoke = dubboApiLocator.invoke(this.dubboMethodEntity);
+                    invoke = dubboApiLocator.invoke(this.dubboMethodEntity);
                     PluginUtils.writeDocument(this.project,
-                                              this.jsonEditorResp.getDocument(),
-                                              JSON.toJSONString(invoke, SerializerFeature.PrettyFormat));
-                    long end = System.currentTimeMillis();
-                    this.tip.setText("time:" + (end - start));
-                    this.tip.updateUI();
-                    return invoke;
-                } catch (Exception e1) {
-                    this.tip.setText("error:" + e1.getMessage());
-                    this.tip.updateUI();
+                            this.jsonEditorResp.getDocument(),
+                            JSON.toJSONString(invoke, SerializerFeature.PrettyFormat));
+                }catch (Exception exception){
+                    String replaceAll = exception.getLocalizedMessage().replaceAll("\r\n", "\n");
+                    PluginUtils.writeDocument(this.project,
+                            this.jsonEditorResp.getDocument(),
+                            replaceAll);
                 }
-                return new Object();
+                long end = System.currentTimeMillis();
+                this.tip.setText("time:" + (end - start));
+                this.tip.updateUI();
+                return invoke;
             });
             executorService.execute(() -> {
                 try {
-                    submit.get(4000, TimeUnit.MILLISECONDS);
+                    submit.get(10, TimeUnit.SECONDS);
                 } catch (Exception ignored) {
 //                    DubboPanel.this.tip.setText(DubboTestBundle.message("dubbo-test.invoke.timeout.tootip"));
                     DubboPanel.this.tip.setText("Timeout...");

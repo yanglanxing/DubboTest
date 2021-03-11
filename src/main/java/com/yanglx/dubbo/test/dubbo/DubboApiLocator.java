@@ -70,7 +70,7 @@ public class DubboApiLocator {
             referenceConfig.destroy();
             String key = addressType.name() + "-" + dubboMethodEntity.getInterfaceName();
             cacheReferenceMap.remove(key);
-            return e.getLocalizedMessage();
+            throw e;
         }
     }
 
