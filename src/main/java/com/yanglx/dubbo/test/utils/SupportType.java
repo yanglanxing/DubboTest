@@ -357,6 +357,7 @@ public enum SupportType {
      */
     public static SupportType touch(PsiVariable parameter) {
         PsiType type = parameter.getType();
+
         if (PsiType.BOOLEAN.equals(type)) {
             return SupportType.BOOLEAN;
         }

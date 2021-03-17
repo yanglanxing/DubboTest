@@ -1,15 +1,14 @@
 package com.yanglx.dubbo.test.dubbo;
 
-import com.alibaba.dubbo.config.ApplicationConfig;
-import com.alibaba.dubbo.config.ReferenceConfig;
-import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.rpc.service.GenericService;
+
 import com.alibaba.fastjson.JSON;
 import com.yanglx.dubbo.test.PluginConstants;
-import org.apache.commons.lang.StringUtils;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import com.yanglx.dubbo.test.utils.StringUtils;
+import org.apache.dubbo.config.ApplicationConfig;
+import org.apache.dubbo.config.ReferenceConfig;
+import org.apache.dubbo.config.RegistryConfig;
+import org.apache.dubbo.config.utils.ReferenceConfigCache;
+import org.apache.dubbo.rpc.service.GenericService;
 
 /**
  * <p>Description: </p>
@@ -22,11 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class DubboApiLocator {
 
-    /** application */
+    /**
+     * application
+     */
     private static final ApplicationConfig application = new ApplicationConfig();
-
-    /** cacheReferenceMap */
-    private static final Map<String, ReferenceConfig<GenericService>> cacheReferenceMap = new ConcurrentHashMap<>();
 
     static {
         application.setName(PluginConstants.PLUGIN_NAME);
@@ -42,71 +40,25 @@ public class DubboApiLocator {
     public Object invoke(DubboMethodEntity dubboMethodEntity) {
         System.out.println(JSON.toJSONString(dubboMethodEntity));
         if (dubboMethodEntity == null
-            || StringUtils.isBlank(dubboMethodEntity.getAddress())
-            || StringUtils.isBlank(dubboMethodEntity.getMethodName())
-            || StringUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
+                || StringUtils.isBlank(dubboMethodEntity.getAddress())
+                || StringUtils.isBlank(dubboMethodEntity.getMethodName())
+                || StringUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
             return "";
         }
         Thread.currentThread().setContextClassLoader(DubboMethodEntity.class.getClassLoader());
 
-        AddressTypeEnum addressType = this.getAddressType(dubboMethodEntity.getAddress());
-        if (addressType.equals(AddressTypeEnum.unknown)) {
-            return "无效地址";
-        }
-
         ReferenceConfig<GenericService> referenceConfig = this.getReferenceConfig(dubboMethodEntity);
-        if (referenceConfig == null) {
-            return null;
-        }
-        GenericService genericService = referenceConfig.get();
-        if (genericService == null) {
-            return null;
-        }
+        ReferenceConfigCache cache = ReferenceConfigCache.getCache();
+        GenericService genericService = cache.get(referenceConfig);
         try {
             return genericService.$invoke(dubboMethodEntity.getMethodName(),
-                                          dubboMethodEntity.getMethodType(),
-                                          dubboMethodEntity.getParamObj());
+                    dubboMethodEntity.getMethodType(),
+                    dubboMethodEntity.getParamObj());
         } catch (Exception e) {
             referenceConfig.destroy();
-            String key = addressType.name() + "-" + dubboMethodEntity.getInterfaceName();
-            cacheReferenceMap.remove(key);
-            return e.getLocalizedMessage();
+            cache.destroy(referenceConfig);
+            throw e;
         }
-    }
-
-    /**
-     * Gets address type *
-     *
-     * @param address address
-     * @return the address type
-     * @since 1.0.0
-     */
-    private AddressTypeEnum getAddressType(String address) {
-        if (address.startsWith("zookeeper")) {
-            return AddressTypeEnum.zookeeper;
-        } else if (address.startsWith("dubbo")) {
-            return AddressTypeEnum.dubbo;
-        } else {
-            return AddressTypeEnum.unknown;
-        }
-    }
-
-    /**
-     * <p>Description: </p>
-     *
-     * @author yanglx
-     * @version 1.0.0
-     * @email "mailto:dev_ylx@163.com"
-     * @date 2021.02.20 15:57
-     * @since 1.0.0
-     */
-    enum AddressTypeEnum {
-        /** Dubbo address type enum */
-        dubbo,
-        /** Zookeeper address type enum */
-        zookeeper,
-        /** Unknown address type enum */
-        unknown
     }
 
     /**
@@ -117,30 +69,24 @@ public class DubboApiLocator {
      * @since 1.0.0
      */
     private ReferenceConfig<GenericService> getReferenceConfig(DubboMethodEntity dubboMethodEntity) {
-        AddressTypeEnum addressType = this.getAddressType(dubboMethodEntity.getAddress());
-        String key = addressType.name() + "-" + dubboMethodEntity.getInterfaceName();
-        ReferenceConfig<GenericService> reference = cacheReferenceMap.get(key);
-        if (null == reference) {
-            reference = new ReferenceConfig<>();
-            reference.setApplication(application);
-            reference.setInterface(dubboMethodEntity.getInterfaceName());
-            reference.setCheck(false);
-            reference.setGeneric(true);
-            reference.setRetries(0);
-            reference.setTimeout(10 * 1000);
-            if (addressType.equals(AddressTypeEnum.zookeeper)) {
-                RegistryConfig registryConfig = getRegistryConfig(dubboMethodEntity);
-                reference.setRegistry(registryConfig);
-            } else if (addressType.equals(AddressTypeEnum.dubbo)) {
-                reference.setUrl(dubboMethodEntity.getAddress());
-            }
-            if (StringUtils.isNotBlank(dubboMethodEntity.getVersion())) {
-                reference.setVersion(dubboMethodEntity.getVersion());
-            }
-            if (StringUtils.isNotBlank(dubboMethodEntity.getGroup())) {
-                reference.setGroup(dubboMethodEntity.getGroup());
-            }
-            cacheReferenceMap.put(key, reference);
+        ReferenceConfig<GenericService> reference = new ReferenceConfig<>();
+        reference.setApplication(application);
+        reference.setInterface(dubboMethodEntity.getInterfaceName());
+        reference.setCheck(false);
+        reference.setGeneric(true);
+        reference.setRetries(0);
+        reference.setTimeout(10 * 1000);
+        if (dubboMethodEntity.getMethodName().startsWith("dubbo")) {
+            reference.setUrl(dubboMethodEntity.getAddress());
+        } else {
+            RegistryConfig registryConfig = this.getRegistryConfig(dubboMethodEntity);
+            reference.setRegistry(registryConfig);
+        }
+        if (StringUtils.isNotBlank(dubboMethodEntity.getVersion())) {
+            reference.setVersion(dubboMethodEntity.getVersion());
+        }
+        if (StringUtils.isNotBlank(dubboMethodEntity.getGroup())) {
+            reference.setGroup(dubboMethodEntity.getGroup());
         }
         return reference;
     }
@@ -152,9 +98,9 @@ public class DubboApiLocator {
      * @return the registry config
      * @since 1.0.0
      */
-    private static RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
+    private RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
         String address = dubboMethodEntity.getAddress();
-        RegistryConfig registryConfig = new RegistryConfig();;
+        RegistryConfig registryConfig = new RegistryConfig();
         registryConfig.setAddress(address);
         return registryConfig;
     }

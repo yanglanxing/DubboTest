@@ -20,6 +20,6 @@ public class HistoryAbstractTabEditorAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        component.createTree(TreePanel.TreeNodeTypeEnum.HISTORY);
+        this.component.refresh(TreePanel.TreeNodeTypeEnum.HISTORY);
     }
 }

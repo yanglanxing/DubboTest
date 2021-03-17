@@ -20,22 +20,48 @@ import java.util.List;
 
 public class TreePanel extends JPanel {
 
-    public TreePanel() {
-        this.setLayout(new BorderLayout());
-    }
+    private Tree tree;
 
     private TreeNodeTypeEnum nowTreeNodeTypeEnum;
 
-    public void refresh() {
-        this.createTree(nowTreeNodeTypeEnum);
+
+    public TreePanel(TreeNodeTypeEnum treeNodeTypeEnum) {
+        this.nowTreeNodeTypeEnum = treeNodeTypeEnum;
+        tree = new Tree();
+        JBScrollPane jScrollBar = new JBScrollPane(tree);
+        this.setLayout(new BorderLayout());
+        this.add(jScrollBar, BorderLayout.CENTER);
+        this.repaint();
+        this.validate();
     }
 
-    public void createTree(TreeNodeTypeEnum treeNodeTypeEnum) {
+    /**
+     * 刷新数据并添加事件
+     */
+    public void refresh(TreeNodeTypeEnum treeNodeTypeEnum) {
         this.nowTreeNodeTypeEnum = treeNodeTypeEnum;
-        this.removeAll();
+        this.refresh();
+    }
+
+    /**
+     * 刷新数据并添加事件
+     */
+    public void refresh() {
+        //添加数据模型
+        this.setModel();
+        //添加监听
+        this.setTreeListener();
+        //添加鼠标右键事件
+        this.addTreeRightButtonAction();
+    }
+
+    /**
+     * 设置数据模型
+     */
+    private void setModel(){
         List<CacheInfo> paramInfoCache;
         DefaultMutableTreeNode root;
-        if (TreeNodeTypeEnum.COLLECTIONS.equals(treeNodeTypeEnum)) {
+        if (TreeNodeTypeEnum.COLLECTIONS.equals(nowTreeNodeTypeEnum)) {
             root = new DefaultMutableTreeNode("Collections");
             DubboSetingState instance = DubboSetingState.getInstance();
             paramInfoCache = instance.getParamInfoCache(DubboSetingState.CacheType.COLLECTIONS);
@@ -48,7 +74,14 @@ public class TreePanel extends JPanel {
             DefaultMutableTreeNode defaultMutableTreeNode = new DefaultMutableTreeNode(dubboMethodEntity, true);
             root.add(defaultMutableTreeNode);
         }
-        Tree tree = new Tree(root);
+        tree.setModel(new DefaultTreeModel(root, false));
+        tree.updateUI();
+    }
+
+    /**
+     * 添加鼠标左键点击事件
+     */
+    private void setTreeListener(){
         //添加左测菜单点击后渲染右侧数据
         tree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -64,11 +97,25 @@ public class TreePanel extends JPanel {
                 DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
             }
         });
+    }
 
+    /**
+     * 添加鼠标右键事件
+     */
+    private void addTreeRightButtonAction(){
         //右键删除操作
         JPopupMenu menu = new JPopupMenu();
-        JMenuItem menuItem = new JMenuItem("delete");
+        JMenuItem menuItem = new JMenuItem("Delete");
         menu.add(menuItem);
+        if (TreeNodeTypeEnum.HISTORY.equals(nowTreeNodeTypeEnum)) {
+            JMenuItem menuItemAll = new JMenuItem("Delete all");
+            menu.add(menuItemAll);
+            menuItemAll.addActionListener(e -> {
+                //删除所有
+                DubboSetingState.getInstance().historyParamInfoCacheList.clear();
+                this.refresh();
+            });
+        }
         menuItem.addActionListener(e -> {
             DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
             if (lastSelectedPathComponent == null) {
@@ -77,20 +124,16 @@ public class TreePanel extends JPanel {
             Object userObject = lastSelectedPathComponent.getUserObject();
             if (userObject instanceof CacheInfo) {
                 CacheInfo cacheInfo = (CacheInfo) userObject;
-                if (TreeNodeTypeEnum.COLLECTIONS.equals(nowTreeNodeTypeEnum)) {
+                if (TreeNodeTypeEnum.COLLECTIONS.equals(this.nowTreeNodeTypeEnum)) {
                     DubboSetingState.getInstance().remove(cacheInfo, DubboSetingState.CacheType.COLLECTIONS);
                 } else {
                     DubboSetingState.getInstance().remove(cacheInfo, DubboSetingState.CacheType.HISTORY);
                 }
-                //删除节点
-                DefaultTreeModel model = (DefaultTreeModel) tree.getModel();
-                model.removeNodeFromParent(lastSelectedPathComponent);
-                tree.updateUI();
+                this.refresh();
             }
         });
-
         //有限显示删除popup
-        tree.addMouseListener(new MouseAdapter() {
+        this.tree.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
@@ -103,10 +146,7 @@ public class TreePanel extends JPanel {
                 }
             }
         });
-        JBScrollPane jScrollBar = new JBScrollPane(tree);
-        this.add(jScrollBar, BorderLayout.CENTER);
-        this.repaint();
-        this.validate();
+
     }
 
     public enum TreeNodeTypeEnum {

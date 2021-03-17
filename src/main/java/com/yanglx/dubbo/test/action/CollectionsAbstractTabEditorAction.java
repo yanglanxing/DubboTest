@@ -19,6 +19,6 @@ public class CollectionsAbstractTabEditorAction extends AnAction {
 
     @Override
     public void actionPerformed(@NotNull AnActionEvent e) {
-        component.createTree(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
+        this.component.refresh(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
     }
 }

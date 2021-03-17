@@ -30,19 +30,19 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
     public ToolBarPanel(Project project, ToolWindow toolWindow) {
         super(false, true);
 
-        actionManager = ActionManager.getInstance();
+        this.actionManager = ActionManager.getInstance();
 
         //分割线
         JBSplitter mContentSplitter = new JBSplitter();
         mContentSplitter.setProportion(0.1f);
 
         //左树结构,默认为收藏
-        leftTree = new TreePanel();
-        leftTree.createTree(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
-        mContentSplitter.setFirstComponent(leftTree);
+        this.leftTree = new TreePanel(TreePanel.TreeNodeTypeEnum.COLLECTIONS);
+        this.leftTree.refresh();
+        mContentSplitter.setFirstComponent(this.leftTree);
         //tabBar
-        tabBar = new TabBar(project, leftTree);
-        mContentSplitter.setSecondComponent(tabBar);
+        this.tabBar = new TabBar(project,this.leftTree);
+        mContentSplitter.setSecondComponent(this.tabBar);
 
         this.setToolbar(createToolbar());
         this.setContent(mContentSplitter);
@@ -50,17 +50,17 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
 
     private JComponent createToolbar() {
-        AddTabAction addTabAction = new AddTabAction(tabBar);
+        AddTabAction addTabAction = new AddTabAction(this.tabBar);
 
-        HistoryAbstractTabEditorAction abstractTabEditorAction = new HistoryAbstractTabEditorAction(leftTree);
-        CollectionsAbstractTabEditorAction collectionsAbstractTabEditorAction = new CollectionsAbstractTabEditorAction(leftTree);
+        HistoryAbstractTabEditorAction abstractTabEditorAction = new HistoryAbstractTabEditorAction(this.leftTree);
+        CollectionsAbstractTabEditorAction collectionsAbstractTabEditorAction = new CollectionsAbstractTabEditorAction(this.leftTree);
         SettingAction settingAction = new SettingAction();
         DefaultActionGroup actionGroup = new DefaultActionGroup();
         actionGroup.add(addTabAction);
         actionGroup.add(collectionsAbstractTabEditorAction);
         actionGroup.add(abstractTabEditorAction);
         actionGroup.add(settingAction);
-        ActionToolbar actionToolbar = actionManager.createActionToolbar("toolbar", actionGroup, false);
+        ActionToolbar actionToolbar = this.actionManager.createActionToolbar("toolbar", actionGroup, false);
         return actionToolbar.getComponent();
     }
 
