@@ -62,6 +62,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     @Override
     public void selectionChanged(TabInfo oldSelection, TabInfo newSelection) {
         Tab tab = (Tab) newSelection.getComponent();
+        tab.getDubboPanel().reset();
         activeTabId = tab.getId();
     }
 

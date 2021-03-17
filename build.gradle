@@ -17,16 +17,15 @@ repositories {
 }
 
 dependencies {
-    implementation('com.alibaba:dubbo:2.6.4') {
+    compile('org.apache.dubbo:dubbo:2.7.3') {
         exclude group: 'org.springframework'
     }
-    implementation('com.alibaba:fastjson:1.2.75')
-    implementation('org.apache.zookeeper:zookeeper:3.4.13')
-    implementation('org.apache.curator:curator-framework:4.0.1')
-    implementation('org.apache.curator:curator-client:4.0.1')
-    implementation('org.javassist:javassist:3.20.0-GA')
-    implementation 'org.apache.commons:commons-lang3:3.11'
-
+    compile('com.alibaba:fastjson:1.2.75')
+    compile 'org.apache.dubbo:dubbo-dependencies-zookeeper:2.7.3'
+    compile('org.javassist:javassist:3.20.0-GA')
+    compile 'org.apache.commons:commons-lang3:3.11'
+    compile 'org.apache.dubbo:dubbo-registry-nacos:2.7.3'
+    compile 'com.alibaba.nacos:nacos-client:1.1.1'
     testImplementation(
             'junit:junit:4.13',
             'org.mockito:mockito-core:3.3.3',

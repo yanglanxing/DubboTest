@@ -22,6 +22,7 @@ import com.yanglx.dubbo.test.ui.DubboPanel;
 import com.yanglx.dubbo.test.ui.Tab;
 import com.yanglx.dubbo.test.ui.TabBar;
 
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -133,7 +134,8 @@ public class PluginUtils {
         TabInfo selectedInfo = TabBar.getSelectionTabInfo();
         Tab component = (Tab)selectedInfo.getComponent();
         DubboSetingState settings = DubboSetingState.getInstance();
-        CacheInfo defaultSetting = settings.getDefaultSetting();
+        List<CacheInfo> dubboConfigs = settings.getDubboConfigs();
+        CacheInfo defaultSetting = dubboConfigs.get(0);
         DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
         dubboMethodEntity.setAddress(defaultSetting.getAddress());
         dubboMethodEntity.setVersion(defaultSetting.getVersion());
@@ -142,6 +144,7 @@ public class PluginUtils {
         dubboMethodEntity.setParamObj(initParamArray);
         dubboMethodEntity.setMethodType(methodType);
         dubboMethodEntity.setMethodName(methodName);
+        dubboMethodEntity.setId(defaultSetting.getId());
         DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
     }
 
