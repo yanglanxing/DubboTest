@@ -114,6 +114,9 @@ public class PluginUtils {
         String[] methodType = new String[parameterList.getParameters().length];
         for (int i = 0; i < parameterList.getParameters().length; i++) {
             String canonicalText = parameterList.getParameters()[i].getType().getCanonicalText();
+            if (canonicalText.startsWith("java.util.List")) {
+                canonicalText = canonicalText.substring(0,canonicalText.indexOf("<"));
+            }
             methodType[i] = canonicalText;
         }
         // 入参
