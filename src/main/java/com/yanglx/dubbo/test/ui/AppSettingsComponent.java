@@ -97,7 +97,8 @@ public class AppSettingsComponent {
             }};
 
     public AppSettingsComponent() {
-        TableModelEditor.DialogItemEditor<MyConfigurableDubboSettings> itemEditor = new TableModelEditor.DialogItemEditor<MyConfigurableDubboSettings>() {
+        TableModelEditor.DialogItemEditor<MyConfigurableDubboSettings> itemEditor =
+                new TableModelEditor.DialogItemEditor<MyConfigurableDubboSettings>() {
             @NotNull
             @Override
             public Class<MyConfigurableDubboSettings> getItemClass() {
