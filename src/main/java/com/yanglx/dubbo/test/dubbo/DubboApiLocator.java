@@ -76,7 +76,7 @@ public class DubboApiLocator {
         reference.setGeneric(true);
         reference.setRetries(0);
         reference.setTimeout(10 * 1000);
-        if (dubboMethodEntity.getMethodName().startsWith("dubbo")) {
+        if (dubboMethodEntity.getAddress().startsWith("dubbo")) {
             reference.setUrl(dubboMethodEntity.getAddress());
         } else {
             RegistryConfig registryConfig = this.getRegistryConfig(dubboMethodEntity);
