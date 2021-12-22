@@ -1,14 +1,23 @@
 package com.yanglx.dubbo.test.dubbo;
 
 
-import com.alibaba.fastjson.JSON;
+import com.google.common.collect.Lists;
+import com.intellij.openapi.diagnostic.Logger;
 import com.yanglx.dubbo.test.PluginConstants;
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.ui.DubboPanel;
+import com.yanglx.dubbo.test.utils.JsonUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
+import org.apache.dubbo.config.utils.ReferenceConfigCache.KeyGenerator;
 import org.apache.dubbo.rpc.service.GenericService;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>Description: </p>
@@ -25,6 +34,33 @@ public class DubboApiLocator {
      * application
      */
     private static final ApplicationConfig application = new ApplicationConfig();
+    private static final Logger LOGGER = Logger.getInstance(DubboPanel.class);
+    private static final String CACHE_NAME = PluginConstants.PLUGIN_NAME;
+
+    /**
+     * change key when dubboTest config changed
+     */
+    private static final KeyGenerator generator = (referenceConfig) -> {
+        // interfaceName
+        String interfaceName = referenceConfig.getInterface();
+        if (StringUtils.isBlank(interfaceName)) {
+            Class<?> clazz = referenceConfig.getInterfaceClass();
+            interfaceName = clazz.getName();
+        }
+        if (StringUtils.isBlank(interfaceName)) {
+            throw new IllegalArgumentException("No interface info in ReferenceConfig" + referenceConfig);
+        }
+
+        // get other unique param
+        String group = StringUtils.defaultString(referenceConfig.getGroup());
+        String version = StringUtils.defaultString(referenceConfig.getVersion());
+        String url = StringUtils.defaultString(referenceConfig.getUrl());
+        String registries = StringUtils.defaultString(
+                JsonUtils.toJSONString(referenceConfig.getRegistries()));
+
+        List<String> uniqueParams = Lists.newArrayList(interfaceName, group, version, url, registries);
+        return String.join("_", uniqueParams);
+    };
 
     static {
         application.setName(PluginConstants.PLUGIN_NAME);
@@ -38,22 +74,22 @@ public class DubboApiLocator {
      * @since 1.0.0
      */
     public Object invoke(DubboMethodEntity dubboMethodEntity) {
-        System.out.println(JSON.toJSONString(dubboMethodEntity));
+        LOGGER.debug("invoke method ", JsonUtils.toJSONString(dubboMethodEntity));
         if (dubboMethodEntity == null
-                || StringUtils.isBlank(dubboMethodEntity.getAddress())
-                || StringUtils.isBlank(dubboMethodEntity.getMethodName())
-                || StringUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
+                || StrUtils.isBlank(dubboMethodEntity.getAddress())
+                || StrUtils.isBlank(dubboMethodEntity.getMethodName())
+                || StrUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
             return "";
         }
         Thread.currentThread().setContextClassLoader(DubboMethodEntity.class.getClassLoader());
 
         ReferenceConfig<GenericService> referenceConfig = this.getReferenceConfig(dubboMethodEntity);
-        ReferenceConfigCache cache = ReferenceConfigCache.getCache();
+        ReferenceConfigCache cache = ReferenceConfigCache.getCache(CACHE_NAME, generator);
         GenericService genericService = cache.get(referenceConfig);
         try {
             return genericService.$invoke(dubboMethodEntity.getMethodName(),
                     dubboMethodEntity.getMethodType(),
-                    dubboMethodEntity.getParamObj());
+                    dubboMethodEntity.getParam());
         } catch (Exception e) {
             referenceConfig.destroy();
             cache.destroy(referenceConfig);
@@ -82,10 +118,10 @@ public class DubboApiLocator {
             RegistryConfig registryConfig = this.getRegistryConfig(dubboMethodEntity);
             reference.setRegistry(registryConfig);
         }
-        if (StringUtils.isNotBlank(dubboMethodEntity.getVersion())) {
+        if (StrUtils.isNotBlank(dubboMethodEntity.getVersion())) {
             reference.setVersion(dubboMethodEntity.getVersion());
         }
-        if (StringUtils.isNotBlank(dubboMethodEntity.getGroup())) {
+        if (StrUtils.isNotBlank(dubboMethodEntity.getGroup())) {
             reference.setGroup(dubboMethodEntity.getGroup());
         }
         return reference;
@@ -101,6 +137,9 @@ public class DubboApiLocator {
     private RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
         String address = dubboMethodEntity.getAddress();
         RegistryConfig registryConfig = new RegistryConfig();
+        Map<String,String> param = new HashMap<>();
+        param.put("dubbo.application.service-discovery.migration","APPLICATION_FIRST");
+        registryConfig.setParameters(param);
         registryConfig.setAddress(address);
         return registryConfig;
     }
