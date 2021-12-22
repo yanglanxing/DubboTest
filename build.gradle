@@ -46,6 +46,6 @@ patchPluginXml {
 }
 
 publishPlugin {
-    token = 'perm:ZGV2X3lseA==.OTItNTMyMw==.MeQr3qlfYrFxj115z48ikYqs9vKcvK'
+    token = System.getenv("publishToken")
     channels publishChannels
 }
