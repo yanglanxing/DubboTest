@@ -4,6 +4,7 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.ui.tabs.TabInfo;
 import com.yanglx.dubbo.test.CacheInfo;
 import com.yanglx.dubbo.test.DubboSetingState;
+import com.yanglx.dubbo.test.PluginConstants;
 import com.yanglx.dubbo.test.ui.AppSettingsComponent;
 import com.yanglx.dubbo.test.ui.MyConfigurableDubboSettings;
 import com.yanglx.dubbo.test.ui.Tab;
@@ -25,7 +26,7 @@ import java.util.stream.Collectors;
     @Nls(capitalization = Nls.Capitalization.Title)
     @Override
     public String getDisplayName() {
-        return "DubboTest";
+        return PluginConstants.PLUGIN_NAME;
     }
 
     @Nullable

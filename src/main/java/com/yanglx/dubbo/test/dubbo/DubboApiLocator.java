@@ -1,7 +1,6 @@
 package com.yanglx.dubbo.test.dubbo;
 
 
-import com.alibaba.fastjson.JSON;
 import com.yanglx.dubbo.test.PluginConstants;
 import com.yanglx.dubbo.test.utils.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
@@ -9,6 +8,9 @@ import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
 import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.rpc.service.GenericService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * <p>Description: </p>
@@ -38,7 +40,6 @@ public class DubboApiLocator {
      * @since 1.0.0
      */
     public Object invoke(DubboMethodEntity dubboMethodEntity) {
-        System.out.println(JSON.toJSONString(dubboMethodEntity));
         if (dubboMethodEntity == null
                 || StringUtils.isBlank(dubboMethodEntity.getAddress())
                 || StringUtils.isBlank(dubboMethodEntity.getMethodName())
@@ -53,7 +54,7 @@ public class DubboApiLocator {
         try {
             return genericService.$invoke(dubboMethodEntity.getMethodName(),
                     dubboMethodEntity.getMethodType(),
-                    dubboMethodEntity.getParamObj());
+                    dubboMethodEntity.getParam());
         } catch (Exception e) {
             referenceConfig.destroy();
             cache.destroy(referenceConfig);
@@ -101,6 +102,9 @@ public class DubboApiLocator {
     private RegistryConfig getRegistryConfig(DubboMethodEntity dubboMethodEntity) {
         String address = dubboMethodEntity.getAddress();
         RegistryConfig registryConfig = new RegistryConfig();
+        Map<String,String> param = new HashMap<>();
+        param.put("dubbo.application.service-discovery.migration","APPLICATION_FIRST");
+        registryConfig.setParameters(param);
         registryConfig.setAddress(address);
         return registryConfig;
     }
