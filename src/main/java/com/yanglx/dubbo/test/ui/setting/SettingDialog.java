@@ -5,7 +5,7 @@ import com.intellij.ui.components.JBTextField;
 import com.intellij.util.ui.FormBuilder;
 import com.yanglx.dubbo.test.common.AddressTypeEnum;
 import com.yanglx.dubbo.test.ui.MyConfigurableDubboSettings;
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
 
 import javax.swing.*;
 
@@ -26,7 +26,7 @@ public class SettingDialog {
         for (AddressTypeEnum value : values) {
             this.comboBox.addItem(value.name());
         }
-        if (StringUtils.isNotBlank(browser.getProtocol())) {
+        if (StrUtils.isNotBlank(browser.getProtocol())) {
             this.comboBox.setSelectedItem(browser.getProtocol());
         } else {
             this.comboBox.setSelectedItem(AddressTypeEnum.zookeeper.name());

@@ -6,7 +6,7 @@ import com.intellij.util.Function;
 import com.intellij.util.ui.table.TableModelEditor;
 import com.yanglx.dubbo.test.ui.AppSettingsComponent;
 import com.yanglx.dubbo.test.ui.MyConfigurableDubboSettings;
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
@@ -85,7 +85,7 @@ public class MyDialogItemEditor implements TableModelEditor.DialogItemEditor<MyC
             browser.setVersion(myConfigurableDubboSettings.getVersion());
             browser.setGroup(myConfigurableDubboSettings.getGroup());
             browser.setName(myConfigurableDubboSettings.getName());
-            if (StringUtils.isNotBlank(browser.getProcessedAddress())) {
+            if (StrUtils.isNotBlank(browser.getProcessedAddress())) {
                 return browser;
             }
         }

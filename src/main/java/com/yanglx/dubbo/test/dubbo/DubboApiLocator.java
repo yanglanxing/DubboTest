@@ -1,12 +1,13 @@
 package com.yanglx.dubbo.test.dubbo;
 
 
-import com.alibaba.fastjson.JSON;
 import com.google.common.collect.Lists;
 import com.intellij.openapi.diagnostic.Logger;
 import com.yanglx.dubbo.test.PluginConstants;
 import com.yanglx.dubbo.test.ui.DubboPanel;
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.utils.JsonUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
 import org.apache.dubbo.config.RegistryConfig;
@@ -14,9 +15,8 @@ import org.apache.dubbo.config.utils.ReferenceConfigCache;
 import org.apache.dubbo.config.utils.ReferenceConfigCache.KeyGenerator;
 import org.apache.dubbo.rpc.service.GenericService;
 
-import java.util.List;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,20 +43,20 @@ public class DubboApiLocator {
     private static final KeyGenerator generator = (referenceConfig) -> {
         // interfaceName
         String interfaceName = referenceConfig.getInterface();
-        if (org.apache.dubbo.common.utils.StringUtils.isBlank(interfaceName)) {
+        if (StringUtils.isBlank(interfaceName)) {
             Class<?> clazz = referenceConfig.getInterfaceClass();
             interfaceName = clazz.getName();
         }
-        if (org.apache.dubbo.common.utils.StringUtils.isBlank(interfaceName)) {
+        if (StringUtils.isBlank(interfaceName)) {
             throw new IllegalArgumentException("No interface info in ReferenceConfig" + referenceConfig);
         }
 
         // get other unique param
-        String group = org.apache.commons.lang3.StringUtils.defaultString(referenceConfig.getGroup());
-        String version = org.apache.commons.lang3.StringUtils.defaultString(referenceConfig.getVersion());
-        String url = org.apache.commons.lang3.StringUtils.defaultString(referenceConfig.getUrl());
-        String registries = org.apache.commons.lang3.StringUtils.defaultString(
-                JSON.toJSONString(referenceConfig.getRegistries()));
+        String group = StringUtils.defaultString(referenceConfig.getGroup());
+        String version = StringUtils.defaultString(referenceConfig.getVersion());
+        String url = StringUtils.defaultString(referenceConfig.getUrl());
+        String registries = StringUtils.defaultString(
+                JsonUtils.toJSONString(referenceConfig.getRegistries()));
 
         List<String> uniqueParams = Lists.newArrayList(interfaceName, group, version, url, registries);
         return String.join("_", uniqueParams);
@@ -74,12 +74,11 @@ public class DubboApiLocator {
      * @since 1.0.0
      */
     public Object invoke(DubboMethodEntity dubboMethodEntity) {
-        LOGGER.debug("invoke method ", JSON.toJSONString(dubboMethodEntity));
-        System.out.println(JSON.toJSONString(dubboMethodEntity));
+        LOGGER.debug("invoke method ", JsonUtils.toJSONString(dubboMethodEntity));
         if (dubboMethodEntity == null
-                || StringUtils.isBlank(dubboMethodEntity.getAddress())
-                || StringUtils.isBlank(dubboMethodEntity.getMethodName())
-                || StringUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
+                || StrUtils.isBlank(dubboMethodEntity.getAddress())
+                || StrUtils.isBlank(dubboMethodEntity.getMethodName())
+                || StrUtils.isBlank(dubboMethodEntity.getInterfaceName())) {
             return "";
         }
         Thread.currentThread().setContextClassLoader(DubboMethodEntity.class.getClassLoader());
@@ -119,10 +118,10 @@ public class DubboApiLocator {
             RegistryConfig registryConfig = this.getRegistryConfig(dubboMethodEntity);
             reference.setRegistry(registryConfig);
         }
-        if (StringUtils.isNotBlank(dubboMethodEntity.getVersion())) {
+        if (StrUtils.isNotBlank(dubboMethodEntity.getVersion())) {
             reference.setVersion(dubboMethodEntity.getVersion());
         }
-        if (StringUtils.isNotBlank(dubboMethodEntity.getGroup())) {
+        if (StrUtils.isNotBlank(dubboMethodEntity.getGroup())) {
             reference.setGroup(dubboMethodEntity.getGroup());
         }
         return reference;

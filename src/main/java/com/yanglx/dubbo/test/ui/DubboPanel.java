@@ -9,7 +9,7 @@ import com.yanglx.dubbo.test.dubbo.DubboApiLocator;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import com.yanglx.dubbo.test.utils.JsonUtils;
 import com.yanglx.dubbo.test.utils.PluginUtils;
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
 
 import javax.swing.*;
 import java.awt.*;
@@ -245,10 +245,10 @@ public class DubboPanel extends JBPanel {
             dialogue.show();
             if (dialogue.isOK()) {
                 String name = dialogue.getText();
-                if (StringUtils.isBlank(name)) {
+                if (StrUtils.isBlank(name)) {
                     name = this.dubboMethodEntity.getInterfaceName() + "#" + this.dubboMethodEntity.getMethodName();
                 }
-                String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
+                String id = StrUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
                 CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
                 instance.add(of, DubboSetingState.CacheType.COLLECTIONS);
                 //刷新左边树结构
@@ -263,7 +263,7 @@ public class DubboPanel extends JBPanel {
                 return;
             }
             String name = this.dubboMethodEntity.getMethodName() + "#" + this.dubboMethodEntity.getInterfaceName();
-            String id = StringUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
+            String id = StrUtils.isBlank(this.dubboMethodEntity.getId()) ? UUID.randomUUID().toString() : this.dubboMethodEntity.getId();
             CacheInfo of = CacheInfo.of(id, name, this.dubboMethodEntity);
             instance.add(of, DubboSetingState.CacheType.COLLECTIONS);
             //刷新左边树结构
@@ -410,7 +410,7 @@ public class DubboPanel extends JBPanel {
     }
 
     private boolean isBlankEntity() {
-        return StringUtils.isBlank(dubboMethodEntity.getMethodName())
-                || StringUtils.isBlank(this.dubboMethodEntity.getInterfaceName());
+        return StrUtils.isBlank(dubboMethodEntity.getMethodName())
+                || StrUtils.isBlank(this.dubboMethodEntity.getInterfaceName());
     }
 }

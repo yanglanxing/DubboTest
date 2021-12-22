@@ -1,6 +1,6 @@
 package com.yanglx.dubbo.test.ui;
 
-import com.yanglx.dubbo.test.utils.StringUtils;
+import com.yanglx.dubbo.test.utils.StrUtils;
 
 import java.util.UUID;
 
@@ -103,7 +103,7 @@ public class MyConfigurableDubboSettings {
     }
 
     public String getProcessedAddress() {
-        if (StringUtils.isNotBlank(this.protocol) && StringUtils.isNotBlank(this.ip) && StringUtils.isNotBlank(this.port)) {
+        if (StrUtils.isNotBlank(this.protocol) && StrUtils.isNotBlank(this.ip) && StrUtils.isNotBlank(this.port)) {
             return this.protocol + "://" + this.ip + ":" + this.port;
         } else {
             return null;
