@@ -48,10 +48,6 @@ public class PluginUtils {
         WriteCommandAction.runWriteCommandAction(project, () -> document.setText(text));
     }
 
-    public static void asynWork(Project project,Runnable runnable){
-        WriteCommandAction.runWriteCommandAction(project, runnable);
-    }
-
     /**
      * element 只有是 method 或者是 method 引用时才可用.
      *
@@ -118,12 +114,6 @@ public class PluginUtils {
         String[] methodType = new String[parameterList.getParameters().length];
         for (int i = 0; i < parameterList.getParameters().length; i++) {
             String canonicalText = parameterList.getParameters()[i].getType().getCanonicalText();
-            if (canonicalText.startsWith("java.util.List")) {
-                canonicalText = canonicalText.substring(0, canonicalText.indexOf("<"));
-            }
-            if (canonicalText.endsWith("...")) {
-                canonicalText = canonicalText.replace("...","[]");
-            }
             methodType[i] = canonicalText;
         }
         // 入参
@@ -142,7 +132,7 @@ public class PluginUtils {
         }
 
         TabInfo selectedInfo = TabBar.getSelectionTabInfo();
-        Tab component = (Tab) selectedInfo.getComponent();
+        Tab component = (Tab)selectedInfo.getComponent();
         DubboSetingState settings = DubboSetingState.getInstance();
         List<CacheInfo> dubboConfigs = settings.getDubboConfigs();
         CacheInfo defaultSetting = dubboConfigs.get(0);
@@ -151,7 +141,7 @@ public class PluginUtils {
         dubboMethodEntity.setVersion(defaultSetting.getVersion());
         dubboMethodEntity.setGroup(defaultSetting.getGroup());
         dubboMethodEntity.setInterfaceName(interfaceName);
-        dubboMethodEntity.setParam(initParamArray);
+        dubboMethodEntity.setParamObj(initParamArray);
         dubboMethodEntity.setMethodType(methodType);
         dubboMethodEntity.setMethodName(methodName);
         dubboMethodEntity.setId(defaultSetting.getId());

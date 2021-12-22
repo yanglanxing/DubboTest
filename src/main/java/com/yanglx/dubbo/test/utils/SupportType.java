@@ -1,5 +1,7 @@
 package com.yanglx.dubbo.test.utils;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiArrayType;
 import com.intellij.psi.PsiClass;
@@ -7,11 +9,16 @@ import com.intellij.psi.PsiField;
 import com.intellij.psi.PsiType;
 import com.intellij.psi.PsiVariable;
 import com.intellij.psi.impl.PsiClassImplUtil;
+import com.intellij.psi.impl.source.PsiClassReferenceType;
 import com.intellij.psi.search.ProjectAndLibrariesScope;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.RandomUtils;
+
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -27,152 +34,318 @@ import java.util.Map;
  * @since 1.0.0
  */
 public enum SupportType {
-    /**
-     * Boolean
-     */
+    /** Boolean */
     BOOLEAN {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return false;
+        public Boolean getRandomValue(PsiVariable psiVariable) {
+            return RandomUtils.nextBoolean();
+        }
+
+        @Override
+        public Boolean getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                return Boolean.valueOf(defaultValue);
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * Char
-     */
+    /** Char */
     CHAR {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return "";
+        public Character getRandomValue(PsiVariable psiVariable) {
+            return RandomStringUtils.randomAlphabetic(1).charAt(0);
+        }
+
+        @Override
+        public Character getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                return defaultValue.charAt(0);
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * Integer
-     */
+    /** Integer */
     INTEGER {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return 0;
+        public Integer getRandomValue(PsiVariable psiVariable) {
+            return RandomUtils.nextInt(10000);
+        }
+
+        @Override
+        public Integer getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (StringUtils.isNumeric(defaultValue)) {
+                return Integer.valueOf(defaultValue);
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * Float
-     */
+    /** Float */
     FLOAT {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return 0;
+        public Float getRandomValue(PsiVariable psiVariable) {
+            return RandomUtils.nextFloat();
+        }
+
+        @Override
+        public Float getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (StringUtils.isNumeric(defaultValue)) {
+                return Float.valueOf(defaultValue);
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * String
-     */
+    /** String */
     STRING {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return "";
+        public String getRandomValue(PsiVariable psiVariable) {
+            return RandomStringUtils.randomAlphanumeric(10);
+        }
+
+        @Override
+        public String getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                return defaultValue;
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * LIST
-     */
+    /** LIST */
     LIST {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
+        public List<Map> getRandomValue(PsiVariable psiVariable) {
             String canonicalText = psiVariable.getType().getCanonicalText();
             if (canonicalText.indexOf("<") > 0) {
                 canonicalText = canonicalText.substring(canonicalText.indexOf("<") + 1, canonicalText.length() - 1);
             }
-            PsiClass psiClass = JavaPsiFacade.getInstance(psiVariable.getProject())
-                    .findClass(canonicalText, new ProjectAndLibrariesScope(psiVariable.getProject()));
+            PsiClass psiClass = JavaPsiFacade
+                .getInstance(psiVariable.getProject())
+                .findClass(canonicalText, new ProjectAndLibrariesScope(psiVariable.getProject()));
             //基础类型直接返回
             if (psiClass == null || isBaseType(psiClass.getQualifiedName())) {
-                return Collections.emptyList();
+                return new ArrayList(0);
             } else {
-                if (isNotExistAndSet(psiClass.getName(),map)) {
-                    Object value = SupportType.getValueByPsiClass(psiClass,map);
-                    List<Object> arrayList = new ArrayList<>(1);
-                    arrayList.add(value);
+                SupportType touch = SupportType.touch(psiClass.getQualifiedName());
+                if (SupportType.OTHER.equals(touch)) {
+                    List arrayList = new ArrayList(1);
+                    arrayList.add(this.obj2Map2(psiClass));
                     return arrayList;
-                }else {
-                    return Collections.emptyList();
+                } else {
+                    return new ArrayList(0);
                 }
             }
         }
+
+        @Override
+        public List<Map> getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                try {
+                    return JSON.parseArray(defaultValue, Map.class);
+                } catch (Exception ignored) {
+                }
+            }
+            return this.getRandomValue(psiVariable);
+        }
+
+        private JSONObject obj2Map2(PsiClass psiClass) {
+            PsiField[] allField = PsiClassImplUtil.getAllFields(psiClass);
+            JSONObject result = new JSONObject(allField.length);
+
+            for (PsiField psiField : allField) {
+                if (psiField.getModifierList().hasModifierProperty("static") || psiField.getModifierList().hasModifierProperty("final")) {
+                    continue;
+                }
+                SupportType supportType = SupportType.touch(psiField);
+
+                if (supportType == SupportType.OTHER) {
+                    PsiClass subPsiClass =
+                        JavaPsiFacade.getInstance(psiClass.getProject()).findClass(psiField.getType().getCanonicalText(),
+                                                                                   new ProjectAndLibrariesScope(psiClass.getProject()));
+                    result.put(psiField.getName(), this.obj2Map2(subPsiClass));
+                } else {
+                    result.put(psiField.getName(), supportType.getRandomValue(psiField));
+                }
+            }
+            result.put("class", psiClass.getQualifiedName());
+            return result;
+        }
     },
-    /**
-     * Map
-     */
+    /** Map */
     MAP {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return new Object();
+        public Map getRandomValue(PsiVariable psiVariable) {
+            return new HashMap(0);
+        }
+
+        @Override
+        public Map getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                try {
+                    return JSON.parseObject(defaultValue);
+                } catch (Exception ignored) {
+                }
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
-    /**
-     * Date
-     */
+    /** Date */
     DATE {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return "";
+        public Date getRandomValue(PsiVariable psiVariable) {
+            return new Date();
+        }
+
+        @Override
+        public Date getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                try {
+                    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    return simpleDateFormat.parse(defaultValue);
+                } catch (Exception e) {
+                }
+            }
+            return this.getRandomValue(psiVariable);
         }
     },
 
-    /**
-     * OTHER
-     */
+    /** OTHER */
     OTHER {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
+        public JSONObject getRandomValue(PsiVariable psiVariable) {
             PsiClass psiClass = JavaPsiFacade.getInstance(psiVariable.getProject()).findClass(psiVariable.getType().getCanonicalText(),
-                    new ProjectAndLibrariesScope(psiVariable.getProject()));
-            if (isNotExistAndSet(psiClass.getName(),map)) {
-                return SupportType.getValueByPsiClass(psiClass,map);
-            }else {
-                return new Object();
+                                                                                              new ProjectAndLibrariesScope(psiVariable.getProject()));
+            return this.obj2Map(psiClass);
+        }
+
+        @Override
+        public Map getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            JSONObject docValue = null;
+            if (defaultValue != null) {
+                try {
+                    docValue = JSON.parseObject(defaultValue);
+                } catch (Exception ignored) {
+                }
             }
 
+            JSONObject randomValue = this.getRandomValue(psiVariable);
+            return this.mergeJson(randomValue, docValue).getInnerMap();
+        }
+
+        public JSONObject mergeJson(JSONObject object1, JSONObject object2) {
+            if (object1 == null && object2 == null) {
+                return null;
+            }
+            if (object1 == null) {
+                return object2;
+            }
+            if (object2 == null) {
+                return object1;
+            }
+            for (String key : object2.keySet()) {
+                Object value2 = object2.get(key);
+                if (object1.containsKey(key)) {
+                    Object value1 = object1.get(key);
+
+                    if (value1 instanceof JSONObject && value2 instanceof JSONObject) {
+                        object1.put(key, this.mergeJson((JSONObject) value1, (JSONObject) value2));
+                    } else {
+                        object1.put(key, value2);
+                    }
+                } else {
+                    object1.put(key, value2);
+                }
+            }
+            return object1;
+        }
+
+        private JSONObject obj2Map(PsiClass psiClass) {
+            PsiField[] allField = PsiClassImplUtil.getAllFields(psiClass);
+            JSONObject result = new JSONObject(allField.length);
+
+            for (PsiField psiField : allField) {
+                if (psiField.getModifierList().hasModifierProperty("static") || psiField.getModifierList().hasModifierProperty("final")) {
+                    continue;
+                }
+                if ("com.xqxc.biz.bean.BaseRequest".equals(psiField.getContainingClass().getQualifiedName())) {
+                    continue;
+                }
+                SupportType supportType = SupportType.touch(psiField);
+
+                if (supportType == SupportType.OTHER) {
+                    PsiClass subPsiClass =
+                        JavaPsiFacade.getInstance(psiClass.getProject()).findClass(psiField.getType().getCanonicalText(),
+                                                                                   new ProjectAndLibrariesScope(psiClass.getProject()));
+                    if ("".equals(subPsiClass.getQualifiedName())) {
+
+                    }
+                    result.put(psiField.getName(), this.obj2Map(subPsiClass));
+                } else {
+                    result.put(psiField.getName(), supportType.getRandomValue(psiField));
+                }
+
+            }
+            result.put("class", psiClass.getQualifiedName());
+            return result;
         }
     },
 
-    /**
-     * Enum
-     */
+    /** Enum */
     ENUM {
         @Override
-        public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            return null;
+        public String getRandomValue(PsiVariable psiVariable) {
+            return ((PsiClassReferenceType) psiVariable.getType()).rawType().resolve().getFields()[0].getName();
+        }
+
+        @Override
+        public String getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap) {
+            String defaultValue = defaultValueMap.get(psiVariable.getName());
+            if (defaultValue != null) {
+                return defaultValue;
+            }
+            return this.getRandomValue(psiVariable);
         }
     };
 
     /**
-     * Gets value *
+     * Gets random value *
      *
      * @param psiVariable psi variable
+     * @return the random value
+     * @since 1.0.0
+     */
+    public abstract Object getRandomValue(PsiVariable psiVariable);
+
+    /**
+     * Gets value *
+     *
+     * @param psiVariable     psi variable
+     * @param defaultValueMap default value map
      * @return the value
      * @since 1.0.0
      */
-    public abstract Object getValue(PsiVariable psiVariable,Map<String,String> map);
+    public abstract Object getValue(PsiVariable psiVariable, Map<String, String> defaultValueMap);
 
-
-    public static Object getValueByPsiClass(PsiClass psiClass,Map<String,String> map) {
-        PsiField[] allField = PsiClassImplUtil.getAllFields(psiClass);
-        Map<String, Object> result = new HashMap<>();
-        for (PsiField psiField : allField) {
-            SupportType touch = touch(psiField);
-            result.put(psiField.getName(), touch.getValue(psiField,map));
+    /**
+     * Touch
+     *
+     * @param type type
+     * @return the support type
+     * @since 1.0.0
+     */
+    public static SupportType touch(String type) {
+        if (Long.class.getCanonicalName().equals(type) ||
+            Integer.class.getCanonicalName().equals(type)) {
+            return SupportType.INTEGER;
         }
-        result.put("class", psiClass.getQualifiedName());
-        return result;
-    }
-
-    public boolean isNotExistAndSet(String str,Map<String,String> map){
-        if (!map.containsKey(str)) {
-            map.put(str,str);
-            return true;
-        }else {
-            return false;
-        }
+        return SupportType.OTHER;
     }
 
     /**
@@ -194,20 +367,20 @@ public enum SupportType {
         }
 
         if (PsiType.BYTE.equals(type)
-                || PsiType.INT.equals(type)
-                || PsiType.LONG.equals(type)
-                || PsiType.SHORT.equals(type)
-                || type.equalsToText(Integer.class.getCanonicalName())
-                || type.equalsToText(Long.class.getCanonicalName())
-                || type.equalsToText(Short.class.getCanonicalName())
-                || type.equalsToText(Byte.class.getCanonicalName())) {
+            || PsiType.INT.equals(type)
+            || PsiType.LONG.equals(type)
+            || PsiType.SHORT.equals(type)
+            || type.equalsToText(Integer.class.getCanonicalName())
+            || type.equalsToText(Long.class.getCanonicalName())
+            || type.equalsToText(Short.class.getCanonicalName())
+            || type.equalsToText(Byte.class.getCanonicalName())) {
             return SupportType.INTEGER;
         }
 
         if (PsiType.DOUBLE.equals(type)
-                || PsiType.FLOAT.equals(type)
-                || type.equalsToText(Double.class.getCanonicalName())
-                || type.equalsToText(Float.class.getCanonicalName())) {
+            || PsiType.FLOAT.equals(type)
+            || type.equalsToText(Double.class.getCanonicalName())
+            || type.equalsToText(Float.class.getCanonicalName())) {
             return SupportType.FLOAT;
         }
 
@@ -220,7 +393,7 @@ public enum SupportType {
         }
 
         if (type.getCanonicalText().startsWith(List.class.getCanonicalName())
-                || type instanceof PsiArrayType) {
+            || type instanceof PsiArrayType) {
             return SupportType.LIST;
         }
 
@@ -244,12 +417,12 @@ public enum SupportType {
      */
     public static boolean isBaseType(String typeStr) {
         String[] types = {String.class.getCanonicalName()
-                , Long.class.getCanonicalName()
-                , Integer.class.getCanonicalName()
-                , Float.class.getCanonicalName()
-                , Byte.class.getCanonicalName()
-                , BigDecimal.class.getCanonicalName()
-                , Double.class.getCanonicalName()};
+            , Long.class.getCanonicalName()
+            , Integer.class.getCanonicalName()
+            , Float.class.getCanonicalName()
+            , Byte.class.getCanonicalName()
+            , BigDecimal.class.getCanonicalName()
+            , Double.class.getCanonicalName()};
         for (String type : types) {
             if (typeStr.equals(type)) {
                 return true;

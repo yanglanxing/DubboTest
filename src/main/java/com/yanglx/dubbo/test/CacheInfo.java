@@ -1,7 +1,8 @@
 package com.yanglx.dubbo.test;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
-import com.yanglx.dubbo.test.utils.JsonUtils;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -12,33 +13,19 @@ import java.util.Objects;
 @Data
 public class CacheInfo implements Serializable {
 
-    /**
-     * Interface name
-     */
+    /** Interface name */
     private String interfaceName;
-    /**
-     * Method name
-     */
+    /** Method name */
     private String methodName;
-    /**
-     * Version
-     */
+    /** Version */
     private String version;
-    /**
-     * Group
-     */
+    /** Group */
     private String group;
-    /**
-     * Method type
-     */
+    /** Method type */
     private String methodTypeJson;
-    /**
-     * Param obj
-     */
+    /** Param obj */
     private String paramObjJson;
-    /**
-     * Address
-     */
+    /** Address */
     private String address;
 
     private String name;
@@ -47,7 +34,7 @@ public class CacheInfo implements Serializable {
 
     private Date date;
 
-    public static CacheInfo of(String id, String name, DubboMethodEntity dubboMethodEntity) {
+    public static CacheInfo of(String id,String name,DubboMethodEntity dubboMethodEntity){
         CacheInfo cacheInfo = new CacheInfo();
         cacheInfo.setId(id);
         cacheInfo.setName(name);
@@ -55,8 +42,8 @@ public class CacheInfo implements Serializable {
         cacheInfo.setMethodName(dubboMethodEntity.getMethodName());
         cacheInfo.setVersion(dubboMethodEntity.getVersion());
         cacheInfo.setGroup(dubboMethodEntity.getGroup());
-        cacheInfo.setMethodTypeJson(JsonUtils.toJSONString(dubboMethodEntity.getMethodType()));
-        cacheInfo.setParamObjJson(JsonUtils.toJSONString(dubboMethodEntity.getParam()));
+        cacheInfo.setMethodTypeJson(JSON.toJSONString(dubboMethodEntity.getMethodType()));
+        cacheInfo.setParamObjJson(JSON.toJSONString(dubboMethodEntity.getParamObj()));
         cacheInfo.setAddress(dubboMethodEntity.getAddress());
         cacheInfo.setDate(new Date());
         return cacheInfo;
@@ -64,25 +51,23 @@ public class CacheInfo implements Serializable {
 
     /**
      * 将CacheInfo转换DubboMethodEntity并返回
-     *
      * @return
      */
-    public DubboMethodEntity getDubboMethodEntity() {
+    public DubboMethodEntity getDubboMethodEntity(){
         DubboMethodEntity dubboMethodEntity = new DubboMethodEntity();
         dubboMethodEntity.setId(this.getId());
         dubboMethodEntity.setInterfaceName(this.getInterfaceName());
         dubboMethodEntity.setMethodName(this.getMethodName());
         dubboMethodEntity.setVersion(this.getVersion());
         dubboMethodEntity.setGroup(this.getGroup());
-
-        List<String> stringList = JsonUtils.toJavaList(this.getMethodTypeJson(), String.class);
+        List<String> stringList = JSON.parseArray(this.getMethodTypeJson(), String.class);
         String[] methodTypes = new String[stringList.size()];
         for (int i = 0; i < stringList.size(); i++) {
             methodTypes[i] = stringList.get(i);
         }
         dubboMethodEntity.setMethodType(methodTypes);
-        String[] array = JsonUtils.toJava(this.getParamObjJson(), String[].class);
-        dubboMethodEntity.setParam(array);
+        JSONArray objects = JSON.parseArray(this.getParamObjJson());
+        dubboMethodEntity.setParamObj(objects.toArray());
         dubboMethodEntity.setAddress(this.getAddress());
         return dubboMethodEntity;
     }

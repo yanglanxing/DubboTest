@@ -17,14 +17,26 @@ repositories {
 }
 
 dependencies {
-    compile('org.apache.dubbo:dubbo:3.0.0') {
+    compile('org.apache.dubbo:dubbo:2.7.3') {
         exclude group: 'org.springframework'
     }
-    compile('com.google.code.gson:gson:2.8.9')
+    compile('com.alibaba:fastjson:1.2.75')
+    compile 'org.apache.dubbo:dubbo-dependencies-zookeeper:2.7.3'
     compile('org.javassist:javassist:3.20.0-GA')
     compile 'org.apache.commons:commons-lang3:3.11'
-    compile 'org.apache.dubbo:dubbo-dependencies-zookeeper:3.0.0'
+    compile 'org.apache.dubbo:dubbo-registry-nacos:2.7.3'
+    compile 'com.alibaba.nacos:nacos-client:1.1.1'
+    testImplementation(
+            'junit:junit:4.13',
+            'org.mockito:mockito-core:3.3.3',
+            'org.assertj:assertj-core:3.15.0',
+            'org.assertj:assertj-swing-junit:3.9.2',
+    )
+}
 
+lombok {
+    version = "1.18.18"
+    generateLombokConfig.enabled = false
 }
 
 intellij {
@@ -33,7 +45,7 @@ intellij {
     plugins = ['com.intellij.java']
     // 插件生成的临时文件的地址，可以省略
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
-    updateSinceUntilBuild = false
+    updateSinceUntilBuild = true
 }
 
 runIde {
@@ -41,11 +53,14 @@ runIde {
 }
 
 patchPluginXml {
+    version "${project.version}"
+    sinceBuild(pluginSinceBuild)
+    untilBuild(pluginUntilBuild)
     pluginDescription(file('includes/pluginDescription.html').text)
     changeNotes(file('includes/pluginChanges.html').text)
 }
 
 publishPlugin {
-    token = 'perm:ZGV2X3lseA==.OTItNTMyMw==.MeQr3qlfYrFxj115z48ikYqs9vKcvK'
+    token = System.getenv("publishToken")
     channels publishChannels
 }

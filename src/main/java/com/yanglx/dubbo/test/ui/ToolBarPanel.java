@@ -12,9 +12,13 @@ import com.yanglx.dubbo.test.action.AddTabAction;
 import com.yanglx.dubbo.test.action.CollectionsAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.HistoryAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.SettingAction;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
+@Getter
+@Setter
 public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
     private ActionManager actionManager;
@@ -22,30 +26,6 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
     private TabBar tabBar;
 
     private TreePanel leftTree;
-
-    public ActionManager getActionManager() {
-        return actionManager;
-    }
-
-    public void setActionManager(ActionManager actionManager) {
-        this.actionManager = actionManager;
-    }
-
-    public TabBar getTabBar() {
-        return tabBar;
-    }
-
-    public void setTabBar(TabBar tabBar) {
-        this.tabBar = tabBar;
-    }
-
-    public TreePanel getLeftTree() {
-        return leftTree;
-    }
-
-    public void setLeftTree(TreePanel leftTree) {
-        this.leftTree = leftTree;
-    }
 
     public ToolBarPanel(Project project, ToolWindow toolWindow) {
         super(false, true);

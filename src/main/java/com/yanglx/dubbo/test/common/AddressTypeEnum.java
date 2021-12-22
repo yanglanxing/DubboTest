@@ -4,7 +4,7 @@ public enum AddressTypeEnum {
     /** Dubbo address type enum */
     dubbo,
     /** nacos address type enum */
-//    nacos,
+    nacos,
     /** Zookeeper address type enum */
     zookeeper
 }
