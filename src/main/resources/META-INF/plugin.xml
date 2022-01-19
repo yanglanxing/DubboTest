@@ -4,7 +4,7 @@
     <vendor email="dev_ylx@163.com" url="">yanglx</vendor>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
-    <idea-version since-build="171.3780.107"/>
+    <idea-version since-build="183"/>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>com.intellij.modules.java</depends>
