@@ -302,7 +302,7 @@ public class DubboPanel extends JBPanel {
 
                     PluginUtils.writeDocument(this.project,
                             this.jsonEditorResp.getDocument(),
-                            JsonUtils.toJSONString(invoke));
+                            JsonUtils.toPrettyJSONString(invoke));
 
                     long end = System.currentTimeMillis();
                     this.tip.setText("time:" + (end - start));
