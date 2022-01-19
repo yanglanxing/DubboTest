@@ -124,9 +124,10 @@ public enum SupportType {
     OTHER {
         @Override
         public Object getValue(PsiVariable psiVariable,Map<String,String> map) {
-            PsiClass psiClass = JavaPsiFacade.getInstance(psiVariable.getProject()).findClass(psiVariable.getType().getCanonicalText(),
+            String className =StrUtils.trimClassName(psiVariable.getType().getCanonicalText());
+            PsiClass psiClass = JavaPsiFacade.getInstance(psiVariable.getProject()).findClass(className,
                     new ProjectAndLibrariesScope(psiVariable.getProject()));
-            if (isNotExistAndSet(psiClass.getName(),map)) {
+            if (psiClass != null && isNotExistAndSet(psiClass.getName(),map)) {
                 return SupportType.getValueByPsiClass(psiClass,map);
             }else {
                 return new Object();
