@@ -24,7 +24,7 @@ public class TabBar extends JBEditorTabs implements TabsListener {
     private TreePanel leftTree;
 
     public TabBar(@Nullable Project project, TreePanel leftTree) {
-        super(project, IdeFocusManager.getInstance(project), project);
+        super(project, ActionManager.getInstance(), IdeFocusManager.getInstance(project), project);
         this.project = project;
         this.leftTree = leftTree;
         tabsMap = new LinkedHashMap<>();
