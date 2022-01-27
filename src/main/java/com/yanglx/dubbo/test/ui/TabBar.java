@@ -9,6 +9,7 @@ import com.intellij.ui.tabs.TabInfo;
 import com.intellij.ui.tabs.TabsListener;
 import com.intellij.ui.tabs.impl.JBEditorTabs;
 import com.yanglx.dubbo.test.action.CloseTabAction;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -18,10 +19,10 @@ import java.util.UUID;
 
 public class TabBar extends JBEditorTabs implements TabsListener {
 
-    public static Map<String, TabInfo> tabsMap;
+    public static Map<String, TabInfo> tabsMap = new LinkedHashMap<>(32);
     public static String activeTabId;
-    private Project project;
-    private TreePanel leftTree;
+    private final Project project;
+    private final TreePanel leftTree;
 
     public TabBar(@Nullable Project project, TreePanel leftTree) {
         super(project, ActionManager.getInstance(), IdeFocusManager.getInstance(project), project);
