@@ -2,11 +2,14 @@ package com.yanglx.dubbo.test.dubbo;
 
 
 import com.google.common.collect.Lists;
+
 import com.intellij.openapi.diagnostic.Logger;
 import com.yanglx.dubbo.test.PluginConstants;
+import com.yanglx.dubbo.test.common.AddressTypeEnum;
 import com.yanglx.dubbo.test.ui.DubboPanel;
 import com.yanglx.dubbo.test.utils.JsonUtils;
 import com.yanglx.dubbo.test.utils.StrUtils;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.dubbo.config.ApplicationConfig;
 import org.apache.dubbo.config.ReferenceConfig;
@@ -109,10 +112,10 @@ public class DubboApiLocator {
         reference.setApplication(application);
         reference.setInterface(dubboMethodEntity.getInterfaceName());
         reference.setCheck(false);
-        reference.setGeneric(true);
+        reference.setGeneric("true");
         reference.setRetries(0);
         reference.setTimeout(10 * 1000);
-        if (dubboMethodEntity.getMethodName().startsWith("dubbo")) {
+        if (dubboMethodEntity.getAddress().startsWith(AddressTypeEnum.dubbo.name())) {
             reference.setUrl(dubboMethodEntity.getAddress());
         } else {
             RegistryConfig registryConfig = this.getRegistryConfig(dubboMethodEntity);
