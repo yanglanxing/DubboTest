@@ -13,7 +13,7 @@ import com.yanglx.dubbo.test.action.CollectionsAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.HistoryAbstractTabEditorAction;
 import com.yanglx.dubbo.test.action.SettingAction;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 
 public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
 
@@ -81,6 +81,7 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
         actionGroup.add(abstractTabEditorAction);
         actionGroup.add(settingAction);
         ActionToolbar actionToolbar = this.actionManager.createActionToolbar("toolbar", actionGroup, false);
+        actionToolbar.setTargetComponent(this.tabBar);
         return actionToolbar.getComponent();
     }
 
