@@ -9,12 +9,14 @@ import com.yanglx.dubbo.test.ui.AppSettingsComponent;
 import com.yanglx.dubbo.test.ui.MyConfigurableDubboSettings;
 import com.yanglx.dubbo.test.ui.Tab;
 import com.yanglx.dubbo.test.ui.TabBar;
+
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.JComponent;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.swing.JComponent;
 
 /**
  * 默认设置
@@ -58,7 +60,10 @@ import java.util.stream.Collectors;
 
         //刷新下拉
         TabInfo selectedInfo = TabBar.getSelectionTabInfo();
-        Tab component = (Tab)selectedInfo.getComponent();
+        if (selectedInfo == null) {
+            return;
+        }
+        Tab component = (Tab) selectedInfo.getComponent();
         component.getDubboPanel().reset();
     }
 
