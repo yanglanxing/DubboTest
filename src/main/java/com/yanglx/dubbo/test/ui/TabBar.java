@@ -36,18 +36,25 @@ public class TabBar extends JBEditorTabs implements TabsListener {
 
     public void addTab() {
         String tabId = UUID.randomUUID().toString();
+        addTab(tabId);
+    }
 
+    public void addTab(String tabId) {
         DefaultActionGroup closeActionGroup = new DefaultActionGroup();
         closeActionGroup.add(new CloseTabAction(this, tabId));
 
-        Tab tab = new Tab(this.project, tabId, this.leftTree);
-        TabInfo tabInfo = new TabInfo(tab);
-        tabInfo.setText("Tab" + (this.getTabCount() + 1));
-        tabInfo.setIcon(AllIcons.General.Web);
-        tabInfo.setTabLabelActions(closeActionGroup, "EditorTab");
+        TabInfo tabInfo = tabsMap.get(tabId);
+        if (tabInfo == null) {
+            Tab tab = new Tab(this.project, tabId, this.leftTree);
+            TabInfo newTabInfo = new TabInfo(tab);
+            newTabInfo.setText("Tab" + (this.getTabCount() + 1));
+            newTabInfo.setIcon(AllIcons.General.Web);
+            newTabInfo.setTabLabelActions(closeActionGroup, "EditorTab");
+            tabsMap.put(tabId, newTabInfo);
+            this.addTab(newTabInfo);
 
-        tabsMap.put(tabId, tabInfo);
-        this.addTab(tabInfo);
+            tabInfo = newTabInfo;
+        }
 
         //显示tab 聚焦当前tab
         this.select(tabInfo, true);

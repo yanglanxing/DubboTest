@@ -64,6 +64,7 @@ public class ToolBarPanel extends SimpleToolWindowPanel implements Disposable {
         this.tabBar = new TabBar(project,this.leftTree);
         mContentSplitter.setSecondComponent(this.tabBar);
 
+        this.leftTree.setTabBar(tabBar);
         this.setToolbar(createToolbar());
         this.setContent(mContentSplitter);
     }
