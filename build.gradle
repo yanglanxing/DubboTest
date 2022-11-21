@@ -1,11 +1,10 @@
 plugins {
-    id 'java'
-    id "io.freefair.lombok" version "5.3.0"
-    id 'org.jetbrains.intellij' version '0.6.5'
+    id('java')
+    id('org.jetbrains.intellij') version '1.9.0'
 }
 
-group group
-version version
+group = group
+version = version
 
 sourceCompatibility = javaVersion
 targetCompatibility = javaVersion
@@ -16,36 +15,35 @@ repositories {
     mavenCentral()
 }
 
+intellij {
+    pluginName = name
+    version = ideaVersion
+    plugins = ['com.intellij.java']
+}
+
 dependencies {
-    compile('org.apache.dubbo:dubbo:3.0.0') {
+    implementation('org.apache.dubbo:dubbo:2.7.13') {
         exclude group: 'org.springframework'
     }
-    compile('com.google.code.gson:gson:2.8.9')
-    compile('org.javassist:javassist:3.20.0-GA')
-    compile 'org.apache.commons:commons-lang3:3.11'
-    compile 'org.apache.dubbo:dubbo-dependencies-zookeeper:3.0.0'
-
+    implementation('com.google.code.gson:gson:2.8.9')
+    implementation('org.javassist:javassist:3.20.0-GA')
+    implementation 'org.apache.commons:commons-lang3:3.11'
+    implementation 'org.apache.dubbo:dubbo-dependencies-zookeeper:2.7.13'
 }
 
-intellij {
-    pluginName name
-    version ideaVersion
-    plugins = ['com.intellij.java']
-    // 插件生成的临时文件的地址，可以省略
-    sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
-    updateSinceUntilBuild = false
-}
+tasks {
+    runIde {
+        jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
+        autoReloadPlugins = true
+    }
 
-runIde {
-    jvmArgs '--add-exports', 'java.base/jdk.internal.vm=ALL-UNNAMED'
-}
+    patchPluginXml {
+        pluginDescription = file('includes/pluginDescription.html').text
+        changeNotes = file('includes/pluginChanges.html').text
+    }
 
-patchPluginXml {
-    pluginDescription(file('includes/pluginDescription.html').text)
-    changeNotes(file('includes/pluginChanges.html').text)
-}
-
-publishPlugin {
-    token = System.getenv("publishToken")
-    channels publishChannels
+    publishPlugin {
+        token = System.getenv("publishToken")
+        channels = [System.getenv("publishChannels")]
+    }
 }

@@ -24,6 +24,7 @@ public class TreePanel extends JPanel {
 
     private TreeNodeTypeEnum nowTreeNodeTypeEnum;
 
+    private TabBar tabBar;
 
     public TreePanel(TreeNodeTypeEnum treeNodeTypeEnum) {
         this.nowTreeNodeTypeEnum = treeNodeTypeEnum;
@@ -33,6 +34,10 @@ public class TreePanel extends JPanel {
         this.add(jScrollBar, BorderLayout.CENTER);
         this.repaint();
         this.validate();
+    }
+
+    public void setTabBar(TabBar tabBar) {
+        this.tabBar = tabBar;
     }
 
     /**
@@ -58,7 +63,7 @@ public class TreePanel extends JPanel {
     /**
      * 设置数据模型
      */
-    private void setModel(){
+    private void setModel() {
         List<CacheInfo> paramInfoCache;
         DefaultMutableTreeNode root;
         if (TreeNodeTypeEnum.COLLECTIONS.equals(nowTreeNodeTypeEnum)) {
@@ -81,7 +86,7 @@ public class TreePanel extends JPanel {
     /**
      * 添加鼠标左键点击事件
      */
-    private void setTreeListener(){
+    private void setTreeListener() {
         //添加左测菜单点击后渲染右侧数据
         tree.addTreeSelectionListener(e -> {
             DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
@@ -93,8 +98,10 @@ public class TreePanel extends JPanel {
                 CacheInfo cacheInfo = (CacheInfo) userObject;
                 DubboMethodEntity dubboMethodEntity = cacheInfo.getDubboMethodEntity();
                 TabInfo selectedInfo = TabBar.getSelectionTabInfo();
-                Tab component = (Tab) selectedInfo.getComponent();
-                DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
+                if (selectedInfo != null) {
+                    Tab component = (Tab) selectedInfo.getComponent();
+                    DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
+                }
             }
         });
     }
@@ -102,7 +109,7 @@ public class TreePanel extends JPanel {
     /**
      * 添加鼠标右键事件
      */
-    private void addTreeRightButtonAction(){
+    private void addTreeRightButtonAction() {
         //右键删除操作
         JPopupMenu menu = new JPopupMenu();
         JMenuItem menuItem = new JMenuItem("Delete");
@@ -137,6 +144,22 @@ public class TreePanel extends JPanel {
             @Override
             public void mouseClicked(MouseEvent e) {
                 super.mouseClicked(e);
+                if (e.getClickCount() == 2) {
+                    // 双击新增 tab
+                    DefaultMutableTreeNode lastSelectedPathComponent = (DefaultMutableTreeNode) tree.getLastSelectedPathComponent();
+                    if (lastSelectedPathComponent == null) {
+                        return;
+                    }
+                    Object userObject = lastSelectedPathComponent.getUserObject();
+                    if (userObject instanceof CacheInfo) {
+                        tabBar.addTab("" + e.getID() + e.getWhen());
+                        Tab component = (Tab) TabBar.getSelectionTabInfo().getComponent();
+                        DubboMethodEntity dubboMethodEntity = ((CacheInfo) userObject).getDubboMethodEntity();
+                        DubboPanel.refreshUI(component.getDubboPanel(), dubboMethodEntity);
+                    }
+                    return;
+                }
+
                 int x = e.getX();
                 int y = e.getY();
                 if (e.getButton() == MouseEvent.BUTTON3) {
