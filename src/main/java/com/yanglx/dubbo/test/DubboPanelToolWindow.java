@@ -6,6 +6,7 @@ import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 
+import com.yanglx.dubbo.test.dubbo.DubboMethodEntity;
 import com.yanglx.dubbo.test.ui.ToolBarPanel;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,9 +34,10 @@ public class DubboPanelToolWindow implements ToolWindowFactory {
         if (project.isDisposed() || toolWindow.isDisposed()) {
             return;
         }
-
+        Thread.currentThread().setContextClassLoader(DubboPanelToolWindow.class.getClassLoader());
         ToolBarPanel dubboPanel = new ToolBarPanel(project, toolWindow);
         ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
+        //        ContentFactory contentFactory = ContentFactory.getInstance();
         Content content = contentFactory.createContent(dubboPanel, null, false);
         toolWindow.getContentManager().addContent(content);
     }

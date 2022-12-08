@@ -1,6 +1,6 @@
 plugins {
     id('java')
-    id('org.jetbrains.intellij') version '1.9.0'
+    id('org.jetbrains.intellij') version '1.10.0'
 }
 
 group = group
@@ -22,13 +22,17 @@ intellij {
 }
 
 dependencies {
-    implementation('org.apache.dubbo:dubbo:2.7.13') {
+    implementation('org.apache.dubbo:dubbo:3.0.0') {
         exclude group: 'org.springframework'
     }
     implementation('com.google.code.gson:gson:2.8.9')
     implementation('org.javassist:javassist:3.20.0-GA')
-    implementation 'org.apache.commons:commons-lang3:3.11'
-    implementation 'org.apache.dubbo:dubbo-dependencies-zookeeper:2.7.13'
+    implementation('org.apache.commons:commons-lang3:3.11')
+    implementation('org.apache.dubbo:dubbo-dependencies-zookeeper:3.0.0') {
+        exclude group: 'org.slf4j'
+        exclude group: 'org.apache.zookeeper'
+    }
+    implementation fileTree(dir: 'lib', includes: ['*.jar'])
 }
 
 tasks {
@@ -44,6 +48,6 @@ tasks {
 
     publishPlugin {
         token = System.getenv("publishToken")
-        channels = [System.getenv("publishChannels")]
+        channels = System.getenv("publishChannels")
     }
 }
